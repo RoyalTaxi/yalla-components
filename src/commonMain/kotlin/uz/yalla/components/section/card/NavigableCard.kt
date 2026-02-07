@@ -1,0 +1,189 @@
+package uz.yalla.components.section.card
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import uz.yalla.design.theme.System
+
+/**
+ * Default configuration for [NavigableCard].
+ *
+ * Provides theme-aware defaults for [colors] and [dimens].
+ */
+object NavigableCardDefaults {
+
+    /**
+     * Color configuration for [NavigableCard].
+     *
+     * @param container Card background color.
+     * @param border Border color.
+     * @param arrow Arrow icon tint.
+     * @param disabledContainer Disabled state background.
+     * @param disabledBorder Disabled state border.
+     * @param disabledArrow Disabled state arrow tint.
+     */
+    @Immutable
+    data class Colors(
+        val container: Color,
+        val border: Color,
+        val arrow: Color,
+        val disabledContainer: Color,
+        val disabledBorder: Color,
+        val disabledArrow: Color,
+    )
+
+    @Composable
+    fun colors(
+        container: Color = Color.Transparent,
+        border: Color = System.color.borderDisabled,
+        arrow: Color = System.color.iconBase,
+        disabledContainer: Color = Color.Transparent,
+        disabledBorder: Color = System.color.borderDisabled.copy(alpha = 0.5f),
+        disabledArrow: Color = System.color.iconDisabled,
+    ) = Colors(
+        container = container,
+        border = border,
+        arrow = arrow,
+        disabledContainer = disabledContainer,
+        disabledBorder = disabledBorder,
+        disabledArrow = disabledArrow,
+    )
+
+    /**
+     * Dimension configuration for [NavigableCard].
+     *
+     * @param radius Corner radius.
+     * @param borderWidth Border stroke width.
+     * @param arrowSize Arrow icon size.
+     * @param iconSpacing Spacing between icon and content.
+     * @param contentPadding Inner content padding.
+     */
+    @Immutable
+    data class Dimens(
+        val radius: Dp,
+        val borderWidth: Dp,
+        val arrowSize: Dp,
+        val iconSpacing: Dp,
+        val contentPadding: Dp,
+    )
+
+    @Composable
+    fun dimens(
+        radius: Dp = 16.dp,
+        borderWidth: Dp = 1.dp,
+        arrowSize: Dp = 24.dp,
+        iconSpacing: Dp = 8.dp,
+        contentPadding: Dp = 16.dp,
+    ) = Dimens(
+        radius = radius,
+        borderWidth = borderWidth,
+        arrowSize = arrowSize,
+        iconSpacing = iconSpacing,
+        contentPadding = contentPadding,
+    )
+}
+
+/**
+ * Navigable card with forward arrow indicating clickable navigation.
+ *
+ * Use for list items that navigate to another screen.
+ *
+ * @param onClick Called when card is clicked.
+ * @param modifier Applied to card.
+ * @param leadingIcon Optional icon before content.
+ * @param enabled Whether card is enabled.
+ * @param colors Color configuration.
+ * @param dimens Dimension configuration.
+ * @param content Card content, receives modifier for weight.
+ */
+@Composable
+fun NavigableCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true,
+    colors: NavigableCardDefaults.Colors = NavigableCardDefaults.colors(),
+    dimens: NavigableCardDefaults.Dimens = NavigableCardDefaults.dimens(),
+    content: @Composable (Modifier) -> Unit,
+) {
+    val shape: Shape = RoundedCornerShape(dimens.radius)
+
+    Card(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        colors = CardDefaults.cardColors(
+            containerColor = colors.container,
+            disabledContainerColor = colors.disabledContainer,
+        ),
+        border = BorderStroke(
+            width = dimens.borderWidth,
+            color = if (enabled) colors.border else colors.disabledBorder,
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(dimens.contentPadding),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (leadingIcon != null) {
+                leadingIcon()
+                Spacer(Modifier.width(dimens.iconSpacing))
+            }
+
+            content(Modifier.weight(1f))
+
+            Spacer(Modifier.width(dimens.iconSpacing))
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = null,
+                tint = if (enabled) colors.arrow else colors.disabledArrow,
+                modifier = Modifier.size(dimens.arrowSize),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun NavigableCardPreview() {
+    Box(
+        modifier = Modifier
+            .background(Color.White)
+            .padding(16.dp)
+    ) {
+        NavigableCard(
+            onClick = {},
+            content = { modifier ->
+                Text(
+                    text = "Profile Settings",
+                    modifier = modifier,
+                )
+            },
+        )
+    }
+}

@@ -1,0 +1,192 @@
+package uz.yalla.components.section.item
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import uz.yalla.design.theme.System
+
+/**
+ * UI state for [ServiceItem].
+ *
+ * @param name Service name.
+ * @param price Formatted price text.
+ * @param checked Whether service is selected.
+ */
+data class ServiceItemState(
+    val name: String,
+    val price: String,
+    val checked: Boolean,
+)
+
+/**
+ * Service toggle item with name, price, and switch.
+ *
+ * Use for optional service selection in order flow.
+ *
+ * ## Usage
+ *
+ * ```kotlin
+ * ServiceItem(
+ *     state = ServiceItemState(
+ *         name = "Child seat",
+ *         price = "+5,000 sum",
+ *         checked = hasChildSeat,
+ *     ),
+ *     onCheckedChange = { viewModel.toggleChildSeat(it) },
+ * )
+ * ```
+ *
+ * @param state Current UI state.
+ * @param onCheckedChange Called when switch changes.
+ * @param modifier Applied to item.
+ * @param enabled Whether item is enabled.
+ * @param shape Item shape.
+ * @param colors Color configuration.
+ *
+ * @see ServiceItemDefaults for default values
+ */
+@Composable
+fun ServiceItem(
+    state: ServiceItemState,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = ServiceItemDefaults.Shape,
+    colors: ServiceItemDefaults.Colors = ServiceItemDefaults.colors(),
+) {
+    Card(
+        onClick = { onCheckedChange(!state.checked) },
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        colors = CardDefaults.cardColors(
+            containerColor = colors.container,
+            disabledContainerColor = colors.container,
+        ),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(ServiceItemDefaults.ContentSpacing),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(ServiceItemDefaults.ContentPadding),
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(ServiceItemDefaults.TitlePriceSpacing),
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = state.name,
+                    color = colors.name,
+                    style = System.font.body.base.bold,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+
+                Text(
+                    text = state.price,
+                    color = colors.price,
+                    style = System.font.body.small.medium,
+                )
+            }
+
+            Switch(
+                checked = state.checked,
+                onCheckedChange = onCheckedChange,
+                enabled = enabled,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = colors.switchThumb,
+                    uncheckedThumbColor = colors.switchThumb,
+                    checkedTrackColor = colors.switchTrackChecked,
+                    uncheckedTrackColor = colors.switchTrackUnchecked,
+                    checkedBorderColor = colors.switchTrackChecked,
+                    uncheckedBorderColor = colors.switchTrackUnchecked,
+                ),
+            )
+        }
+    }
+}
+
+/**
+ * Default values for [ServiceItem].
+ */
+object ServiceItemDefaults {
+
+    val Shape: Shape = RectangleShape
+    val ContentPadding: PaddingValues = PaddingValues(
+        vertical = 8.dp,
+        horizontal = 20.dp,
+    )
+    val ContentSpacing: Dp = 16.dp
+    val TitlePriceSpacing: Dp = 8.dp
+
+    /**
+     * Color configuration for [ServiceItem].
+     */
+    @Immutable
+    data class Colors(
+        val container: Color,
+        val name: Color,
+        val price: Color,
+        val switchThumb: Color,
+        val switchTrackChecked: Color,
+        val switchTrackUnchecked: Color,
+    )
+
+    @Composable
+    fun colors(
+        container: Color = Color.Transparent,
+        name: Color = System.color.textBase,
+        price: Color = System.color.textSubtle,
+        switchThumb: Color = System.color.iconWhite,
+        switchTrackChecked: Color = System.color.buttonActive,
+        switchTrackUnchecked: Color = System.color.iconDisabled,
+    ): Colors = Colors(
+        container = container,
+        name = name,
+        price = price,
+        switchThumb = switchThumb,
+        switchTrackChecked = switchTrackChecked,
+        switchTrackUnchecked = switchTrackUnchecked,
+    )
+}
+
+@Preview
+@Composable
+private fun ServiceItemPreview() {
+    Box(
+        modifier = Modifier
+            .background(Color.White)
+            .padding(16.dp)
+    ) {
+        ServiceItem(
+            state = ServiceItemState(
+                name = "Child seat",
+                price = "+5,000 sum",
+                checked = true,
+            ),
+            onCheckedChange = {},
+        )
+    }
+}

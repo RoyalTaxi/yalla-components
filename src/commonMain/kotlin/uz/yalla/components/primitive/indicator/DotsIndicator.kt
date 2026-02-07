@@ -1,0 +1,124 @@
+package uz.yalla.components.primitive.indicator
+
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import uz.yalla.design.theme.System
+
+/**
+ * Animated dots indicator for pagers and carousels.
+ *
+ * Current page dot expands while others remain small.
+ *
+ * ## Usage
+ *
+ * ```kotlin
+ * DotsIndicator(
+ *     pageCount = 5,
+ *     currentPage = pagerState.currentPage,
+ * )
+ * ```
+ *
+ * @param pageCount Total number of pages.
+ * @param currentPage Currently selected page (0-indexed).
+ * @param modifier Applied to indicator row.
+ * @param colors Color configuration.
+ *
+ * @see DotsIndicatorDefaults for default values
+ */
+@Composable
+fun DotsIndicator(
+    pageCount: Int,
+    currentPage: Int,
+    modifier: Modifier = Modifier,
+    colors: DotsIndicatorDefaults.Colors = DotsIndicatorDefaults.colors(),
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(DotsIndicatorDefaults.DotSpacing),
+    ) {
+        repeat(pageCount) { index ->
+            val isSelected = index == currentPage
+
+            val width by animateDpAsState(
+                targetValue = if (isSelected) {
+                    DotsIndicatorDefaults.SelectedWidth
+                } else {
+                    DotsIndicatorDefaults.DotSize
+                },
+                animationSpec = tween(durationMillis = 200),
+                label = "dotWidth",
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(width = width, height = DotsIndicatorDefaults.DotSize)
+                    .clip(CircleShape)
+                    .background(
+                        if (isSelected) colors.selected else colors.unselected
+                    ),
+            )
+        }
+    }
+}
+
+/**
+ * Default values for [DotsIndicator].
+ */
+object DotsIndicatorDefaults {
+
+    val DotSize: Dp = 8.dp
+    val SelectedWidth: Dp = 24.dp
+    val DotSpacing: Dp = 8.dp
+
+    /**
+     * Color configuration for [DotsIndicator].
+     */
+    @Immutable
+    data class Colors(
+        val selected: Color,
+        val unselected: Color,
+    )
+
+    @Composable
+    fun colors(
+        selected: Color = System.color.buttonActive,
+        unselected: Color = System.color.backgroundTertiary,
+    ): Colors = Colors(
+        selected = selected,
+        unselected = unselected,
+    )
+}
+
+
+@Preview
+@Composable
+private fun DotsIndicatorPreview() {
+    Box(
+        modifier = Modifier
+            .background(Color.White)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        DotsIndicator(
+            pageCount = 5,
+            currentPage = 2,
+        )
+    }
+}

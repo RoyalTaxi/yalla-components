@@ -1,0 +1,89 @@
+[versions]
+# Yalla libraries
+yalla-core = "1.0.0"
+yalla-design = "1.1.0"
+yalla-resources = "1.5.0"
+yalla-platform = "2.1.2"
+
+# Core
+agp = "9.0.0"
+kotlin = "2.3.0"
+compose-multiplatform = "1.10.0"
+compose-material3 = "1.9.0-beta03"
+
+# AndroidX
+androidx-core-ktx = "1.17.0"
+lifecycle = "2.10.0-alpha06"
+
+# Coroutines & Serialization
+coroutines = "1.10.2"
+kotlin-serialization = "1.9.0"
+kotlinx-datetime = "0.7.1-0.6.x-compat"
+
+# DI & Architecture
+koin-bom = "4.1.0"
+orbit = "10.0.0"
+
+# Image loading
+coil = "3.3.0"
+
+# Location
+geo = "0.8.0"
+
+# Connectivity
+connectivity = "2.4.0"
+
+# UI Components
+cupertino = "2.3.1"
+
+[libraries]
+# Yalla
+yalla-core = { module = "uz.yalla:core", version.ref = "yalla-core" }
+yalla-design = { module = "uz.yalla:design", version.ref = "yalla-design" }
+yalla-resources = { module = "uz.yalla:resources", version.ref = "yalla-resources" }
+yalla-platform = { module = "uz.yalla:platform", version.ref = "yalla-platform" }
+
+# Compose Material3
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
+
+# AndroidX
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
+androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+
+# Coroutines & Serialization
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+
+# DI
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
+koin-core = { module = "io.insert-koin:koin-core" }
+koin-android = { module = "io.insert-koin:koin-android" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
+
+# Architecture
+orbit-core = { module = "org.orbit-mvi:orbit-core", version.ref = "orbit" }
+orbit-viewmodel = { module = "org.orbit-mvi:orbit-viewmodel", version.ref = "orbit" }
+orbit-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbit" }
+
+# Image loading
+coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+
+# Location
+geo = { module = "dev.icerock.moko:geo", version.ref = "geo" }
+geo-compose = { module = "dev.icerock.moko:geo-compose", version.ref = "geo" }
+
+# Connectivity
+connectivity-device = { module = "dev.jordond.connectivity:connectivity-device", version.ref = "connectivity" }
+
+# Cupertino (iOS-style components)
+cupertino = { module = "io.github.schott12521:cupertino", version.ref = "cupertino" }
+
+[plugins]
+android-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
