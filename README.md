@@ -7,7 +7,7 @@ Kotlin Multiplatform component library for Yalla apps. Provides reusable UI comp
 Add the dependency to your `build.gradle.kts`:
 
 ```kotlin
-implementation("uz.yalla:components:1.1.0")
+implementation("uz.yalla:components:1.1.1")
 ```
 
 Configure GitHub Packages repository:
