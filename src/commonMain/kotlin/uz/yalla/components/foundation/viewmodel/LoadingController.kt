@@ -11,7 +11,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlinx.datetime.Clock
+import kotlin.time.TimeSource
 
 /**
  * Controls loading state with smart timing to prevent UI flicker.
@@ -54,66 +54,68 @@ class LoadingController(
     private val mutex = Mutex()
     private var activeOperations = 0
     private var showJob: Job? = null
-    private var visibleSince: Long? = null
+    private var visibleSince: TimeSource.Monotonic.ValueTimeMark? = null
 
     /**
      * Executes [block] with loading state management.
      *
+     * Optionally override [showAfter] and [minDisplayTime] for this specific call.
+     *
      * @param T Return type of the operation
+     * @param showAfter Delay before showing loading. Defaults to controller's configured value.
+     * @param minDisplayTime Minimum display time once shown. Defaults to controller's configured value.
      * @param block Suspending operation to execute
      * @return Result of [block]
      */
-    suspend fun <T> withLoading(block: suspend () -> T): T = coroutineScope {
-        startLoading()
-        try {
-            block()
-        } finally {
-            stopLoading()
-        }
-    }
+    suspend fun <T> withLoading(
+        showAfter: Duration = this.showAfter,
+        minDisplayTime: Duration = this.minDisplayTime,
+        block: suspend () -> T,
+    ): T = coroutineScope {
+        val localShowJob: Job?
 
-    private suspend fun startLoading() {
         mutex.withLock {
             activeOperations++
-            if (activeOperations == 1) {
-                showJob = coroutineScope {
-                    launch {
-                        delay(showAfter)
-                        mutex.withLock {
-                            if (activeOperations > 0) {
-                                _loading.value = true
-                                visibleSince = currentTimeMillis()
-                            }
+            if (activeOperations == 1 && !_loading.value) {
+                localShowJob = launch {
+                    delay(showAfter)
+                    mutex.withLock {
+                        if (activeOperations > 0 && !_loading.value) {
+                            _loading.value = true
+                            visibleSince = TimeSource.Monotonic.markNow()
                         }
                     }
                 }
+                showJob = localShowJob
+            } else {
+                localShowJob = null
             }
         }
-    }
 
-    private suspend fun stopLoading() {
-        mutex.withLock {
-            activeOperations--
-            if (activeOperations == 0) {
-                showJob?.cancel()
-                showJob = null
+        try {
+            block()
+        } finally {
+            mutex.withLock {
+                activeOperations--
+                if (activeOperations == 0) {
+                    localShowJob?.cancel()
+                    showJob?.cancel()
+                    showJob = null
 
-                visibleSince?.let { startTime ->
-                    val elapsed = currentTimeMillis() - startTime
-                    val remaining = minDisplayTime.inWholeMilliseconds - elapsed
-                    if (remaining > 0) {
-                        delay(remaining)
+                    visibleSince?.let { mark ->
+                        val elapsed = mark.elapsedNow()
+                        val remaining = minDisplayTime - elapsed
+                        if (remaining.isPositive()) {
+                            delay(remaining)
+                        }
                     }
-                }
 
-                _loading.value = false
-                visibleSince = null
+                    _loading.value = false
+                    visibleSince = null
+                }
             }
         }
     }
-
-    private fun currentTimeMillis(): Long =
-        Clock.System.now().toEpochMilliseconds()
 
     companion object {
         /** Default delay before showing loading indicator. */

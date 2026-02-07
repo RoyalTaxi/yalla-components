@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,11 +49,11 @@ import uz.yalla.design.theme.System
  */
 @Composable
 fun LargeTopBar(
-    title: String,
+    title: String?,
     modifier: Modifier = Modifier,
     onNavigationClick: (() -> Unit)? = null,
     colors: LargeTopBarDefaults.Colors = LargeTopBarDefaults.colors(),
-    actions: @Composable (RowScope.() -> Unit)? = null,
+    actions: @Composable (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -85,13 +84,15 @@ fun LargeTopBar(
         }
 
         // Title
-        Spacer(Modifier.height(LargeTopBarDefaults.TitleTopSpacing))
+        if (title != null) {
+            Spacer(Modifier.height(LargeTopBarDefaults.TitleTopSpacing))
 
-        Text(
-            text = title,
-            style = System.font.title.large,
-            color = colors.title,
-        )
+            Text(
+                text = title,
+                style = System.font.title.large,
+                color = colors.title,
+            )
+        }
     }
 }
 

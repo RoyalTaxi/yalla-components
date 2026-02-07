@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -64,7 +63,7 @@ fun TopBar(
     title: String? = null,
     onNavigationClick: (() -> Unit)? = null,
     colors: TopBarDefaults.Colors = TopBarDefaults.colors(),
-    actions: @Composable (RowScope.() -> Unit)? = null,
+    actions: @Composable (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier

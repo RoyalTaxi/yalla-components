@@ -39,6 +39,34 @@ import uz.yalla.components.primitive.button.PrimaryButton
 import uz.yalla.design.theme.System
 
 /**
+ * Data for [ConfirmationSheet].
+ *
+ * @param sheetName Optional header title displayed at top
+ * @param image Illustration image
+ * @param title Main title text
+ * @param description Description text
+ * @param actionText Primary action button text
+ */
+data class ConfirmationSheetData(
+    val sheetName: String?,
+    val image: Painter,
+    val title: String,
+    val description: String,
+    val actionText: String,
+)
+
+/**
+ * Effects emitted by [ConfirmationSheet].
+ */
+sealed interface ConfirmationSheetEffect {
+    /** User dismissed the sheet. */
+    data object Dismiss : ConfirmationSheetEffect
+
+    /** User confirmed the action. */
+    data object Confirm : ConfirmationSheetEffect
+}
+
+/**
  * Confirmation sheet with image, title, description, and action.
  *
  * Use for confirmations, success messages, or informational modals.
@@ -47,43 +75,42 @@ import uz.yalla.design.theme.System
  *
  * ```kotlin
  * ConfirmationSheet(
- *     isVisible = showSuccess,
- *     image = painterResource(Res.drawable.img_success),
- *     title = "Order Placed",
- *     description = "Your driver is on the way.",
- *     actionText = "Got it",
- *     onConfirm = { viewModel.confirmOrder() },
- *     onDismiss = { viewModel.dismissSheet() },
+ *     isVisible = state.showSuccess,
+ *     data = ConfirmationSheetData(
+ *         sheetTitle = "Order Status",
+ *         image = painterResource(Res.drawable.img_success),
+ *         title = "Order Placed",
+ *         description = "Your driver is on the way.",
+ *         actionText = "Got it",
+ *     ),
+ *     onEffect = { effect ->
+ *         when (effect) {
+ *             ConfirmationSheetEffect.Dismiss -> viewModel.dismissSheet()
+ *             ConfirmationSheetEffect.Confirm -> viewModel.confirmOrder()
+ *         }
+ *     },
  * )
  * ```
  *
  * @param isVisible Whether sheet is visible
- * @param image Illustration image
- * @param title Title text
- * @param description Description text
- * @param actionText Primary action button text
- * @param onConfirm Called when action button clicked
- * @param onDismiss Called when sheet dismissed
+ * @param data Sheet content data
+ * @param onEffect Callback for sheet effects (dismiss, confirm)
  * @param modifier Applied to sheet
- * @param sheetTitle Optional header title
  * @param closeButton Optional close button slot
  * @param shape Sheet corner shape
  * @param colors Color configuration
  *
+ * @see ConfirmationSheetData for content configuration
+ * @see ConfirmationSheetEffect for available effects
  * @see ConfirmationSheetDefaults for default values
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmationSheet(
     isVisible: Boolean,
-    image: Painter,
-    title: String,
-    description: String,
-    actionText: String,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
+    data: ConfirmationSheetData,
+    onEffect: (ConfirmationSheetEffect) -> Unit,
     modifier: Modifier = Modifier,
-    sheetTitle: String? = null,
     closeButton: (@Composable () -> Unit)? = null,
     shape: Shape = ConfirmationSheetDefaults.Shape,
     colors: ConfirmationSheetDefaults.Colors = ConfirmationSheetDefaults.colors(),
@@ -116,7 +143,7 @@ fun ConfirmationSheet(
 
     Sheet(
         isVisible = isVisible,
-        onDismissRequest = onDismiss,
+        onDismissRequest = { onEffect(ConfirmationSheetEffect.Dismiss) },
         modifier = modifier,
         shape = shape,
         colors = SheetDefaults.colors(
@@ -133,9 +160,9 @@ fun ConfirmationSheet(
                     .fillMaxWidth()
                     .padding(horizontal = ConfirmationSheetDefaults.HeaderHorizontalPadding),
             ) {
-                if (sheetTitle != null) {
+                data.sheetName?.let { title ->
                     Text(
-                        text = sheetTitle,
+                        text = title,
                         style = System.font.body.large.medium,
                         color = colors.title,
                         modifier = Modifier.align(Alignment.Center),
@@ -157,7 +184,7 @@ fun ConfirmationSheet(
                     .offset { IntOffset(0, contentOffsetY.toInt()) },
             ) {
                 Image(
-                    painter = image,
+                    painter = data.image,
                     contentDescription = null,
                     contentScale = ContentScale.Inside,
                     modifier = Modifier
@@ -168,7 +195,7 @@ fun ConfirmationSheet(
                 Spacer(Modifier.height(ConfirmationSheetDefaults.ImageBottomSpacing))
 
                 Text(
-                    text = title,
+                    text = data.title,
                     style = System.font.title.base,
                     color = colors.title,
                     textAlign = TextAlign.Center,
@@ -177,7 +204,7 @@ fun ConfirmationSheet(
                 Spacer(Modifier.height(ConfirmationSheetDefaults.TitleDescriptionSpacing))
 
                 Text(
-                    text = description,
+                    text = data.description,
                     style = System.font.body.base.medium,
                     color = colors.description,
                     textAlign = TextAlign.Center,
@@ -187,8 +214,8 @@ fun ConfirmationSheet(
             Spacer(Modifier.height(ConfirmationSheetDefaults.ActionTopSpacing))
 
             PrimaryButton(
-                text = actionText,
-                onClick = onConfirm,
+                text = data.actionText,
+                onClick = { onEffect(ConfirmationSheetEffect.Confirm) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = ConfirmationSheetDefaults.ActionHorizontalPadding)
