@@ -1,6 +1,5 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -23,10 +22,6 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
-
-        publishing {
-            singleVariant("release")
-        }
     }
 
     listOf(
@@ -43,20 +38,18 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // Yalla libraries
-            implementation(libs.yalla.core)
             implementation(libs.yalla.design)
             implementation(libs.yalla.resources)
             implementation(libs.yalla.platform)
 
             // Compose
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.ui.tooling.preview)
 
-            // DI (using BOM)
-            implementation(platform(libs.koin.bom))
+            // DI
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)
 
@@ -110,7 +103,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/YallaApp/yalla-components")
+            url = uri("https://maven.pkg.github.com/RoyalTaxi/yalla-components")
             credentials {
                 username = findProperty("gpr.user") as String?
                     ?: System.getenv("GITHUB_ACTOR")

@@ -1,6 +1,5 @@
 [versions]
 # Yalla libraries
-yalla-core = "1.0.0"
 yalla-design = "1.1.0"
 yalla-resources = "1.5.0"
 yalla-platform = "2.1.2"
@@ -38,13 +37,16 @@ cupertino = "2.3.1"
 
 [libraries]
 # Yalla
-yalla-core = { module = "uz.yalla:core", version.ref = "yalla-core" }
 yalla-design = { module = "uz.yalla:design", version.ref = "yalla-design" }
 yalla-resources = { module = "uz.yalla:resources", version.ref = "yalla-resources" }
 yalla-platform = { module = "uz.yalla:platform", version.ref = "yalla-platform" }
 
-# Compose Material3
+# Compose
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-multiplatform" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
+compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
 
 # AndroidX
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
@@ -57,10 +59,9 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
 # DI
-koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
-koin-core = { module = "io.insert-koin:koin-core" }
-koin-android = { module = "io.insert-koin:koin-android" }
-koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin-bom" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-bom" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin-bom" }
 
 # Architecture
 orbit-core = { module = "org.orbit-mvi:orbit-core", version.ref = "orbit" }
