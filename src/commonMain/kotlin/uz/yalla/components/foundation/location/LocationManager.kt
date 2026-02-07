@@ -66,11 +66,6 @@ class LocationManager(
                     _currentLocation.value = ExtendedLocation(
                         latitude = location.latitude,
                         longitude = location.longitude,
-                        accuracy = location.accuracy.toFloat(),
-                        altitude = location.altitude,
-                        speed = location.speed?.toFloat(),
-                        bearing = location.azimuth?.toFloat(),
-                        timestamp = location.timestampMs,
                     )
                 }
         }
@@ -79,7 +74,9 @@ class LocationManager(
     /** Starts location tracking. Requires location permission. */
     fun startTracking() {
         if (_isTracking.value) return
-        locationTracker.startTracking()
+        scope.launch {
+            locationTracker.startTracking()
+        }
         _isTracking.value = true
     }
 

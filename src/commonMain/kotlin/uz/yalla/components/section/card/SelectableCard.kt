@@ -27,7 +27,7 @@ import uz.yalla.design.theme.System
 import uz.yalla.resources.Res
 import uz.yalla.resources.ic_checkbox
 import uz.yalla.resources.ic_checkbox_border
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.Text
 
 /**

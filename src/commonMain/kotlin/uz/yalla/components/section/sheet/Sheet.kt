@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import uz.yalla.design.theme.System
 
 /**
@@ -152,6 +152,7 @@ fun SheetDragHandle(
 /**
  * Default values for [Sheet].
  */
+@OptIn(ExperimentalMaterial3Api::class)
 object SheetDefaults {
 
     val Shape: Shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)

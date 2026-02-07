@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import uz.yalla.design.theme.System
 
 /**
@@ -160,8 +160,8 @@ object ListItemDefaults {
         title: Color = System.color.textBase,
         subtitle: Color = System.color.textSubtle,
         disabledContainer: Color = Color.Transparent,
-        disabledTitle: Color = System.color.textDisabled,
-        disabledSubtitle: Color = System.color.textDisabled,
+        disabledTitle: Color = System.color.textSubtle.copy(alpha = 0.5f),
+        disabledSubtitle: Color = System.color.textSubtle.copy(alpha = 0.5f),
     ): Colors = Colors(
         container = container,
         title = title,
