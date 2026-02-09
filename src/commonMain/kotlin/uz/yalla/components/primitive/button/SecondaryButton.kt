@@ -18,7 +18,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.tooling.preview.Preview
+import uz.yalla.components.model.common.ButtonSize
+import uz.yalla.design.theme.System
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.unit.Dp
+
+/**
+ * State for [SecondaryButton] component.
+ *
+ * Bundles button content and behavior properties for simplified component usage.
+ *
+ * @property text Button label.
+ * @property enabled When false, button appears disabled and is not clickable.
+ * @property loading When true, shows spinner and disables interaction.
+ * @property size Button size variant.
+ */
+data class SecondaryButtonState(
+    val text: String,
+    val enabled: Boolean = true,
+    val loading: Boolean = false,
+    val size: ButtonSize = ButtonSize.Medium
+)
 
 /**
  * Secondary action button for alternative or less prominent actions.
@@ -30,18 +54,17 @@ import androidx.compose.ui.tooling.preview.Preview
  *
  * ```kotlin
  * SecondaryButton(
- *     text = "Cancel",
+ *     state = SecondaryButtonState(text = "Cancel"),
  *     onClick = onCancel,
  * )
  * ```
  *
- * @param text Button label.
- * @param onClick Invoked on click.
+ * @param state Button state containing text, enabled, loading, and size.
+ * @param onClick Invoked on click. Not called when disabled or loading.
  * @param modifier Applied to button container.
- * @param enabled When false, button is disabled.
- * @param loading When true, shows spinner.
- * @param size Button size variant.
- * @param colors Color configuration.
+ * @param colors Color configuration, defaults to [SecondaryButtonDefaults.colors].
+ * @param style Text style configuration, defaults to [SecondaryButtonDefaults.style].
+ * @param dimens Dimension configuration, defaults to [SecondaryButtonDefaults.dimens].
  * @param leadingIcon Optional icon before text.
  * @param trailingIcon Optional icon after text.
  *
@@ -50,58 +73,57 @@ import androidx.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun SecondaryButton(
-    text: String,
+    state: SecondaryButtonState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    size: ButtonSize = ButtonSize.Medium,
-    colors: SecondaryButtonDefaults.Colors = SecondaryButtonDefaults.colors(),
+    colors: SecondaryButtonDefaults.SecondaryButtonColors = SecondaryButtonDefaults.colors(),
+    style: SecondaryButtonDefaults.SecondaryButtonStyle = SecondaryButtonDefaults.style(),
+    dimens: SecondaryButtonDefaults.SecondaryButtonDimens = SecondaryButtonDefaults.dimens(),
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
-    val isInteractive = enabled && !loading
+    val isInteractive = state.enabled && !state.loading
 
     Surface(
         onClick = onClick,
         modifier = modifier.defaultMinSize(
-            minWidth = SecondaryButtonDefaults.minWidth(size),
-            minHeight = SecondaryButtonDefaults.minHeight(size),
+            minWidth = dimens.minWidth(state.size),
+            minHeight = dimens.minHeight(state.size),
         ),
         enabled = isInteractive,
-        shape = SecondaryButtonDefaults.Shape,
+        shape = dimens.shape,
         color = colors.containerColor(isInteractive),
         contentColor = colors.contentColor(isInteractive),
     ) {
         Row(
-            modifier = Modifier.padding(SecondaryButtonDefaults.contentPadding(size)),
+            modifier = Modifier.padding(dimens.contentPadding(state.size)),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (loading) {
+            if (state.loading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(SecondaryButtonDefaults.IconSize),
+                    modifier = Modifier.size(dimens.iconSize),
                     strokeWidth = 2.dp,
                     color = LocalContentColor.current,
                 )
             } else {
                 leadingIcon?.let { icon ->
                     Box(
-                        modifier = Modifier.size(SecondaryButtonDefaults.IconSize),
+                        modifier = Modifier.size(dimens.iconSize),
                         contentAlignment = Alignment.Center,
                     ) { icon() }
-                    Spacer(Modifier.width(SecondaryButtonDefaults.IconSpacing))
+                    Spacer(Modifier.width(dimens.iconSpacing))
                 }
 
                 Text(
-                    text = text,
-                    style = SecondaryButtonDefaults.textStyle(size),
+                    text = state.text,
+                    style = style.textStyle(state.size),
                 )
 
                 trailingIcon?.let { icon ->
-                    Spacer(Modifier.width(SecondaryButtonDefaults.IconSpacing))
+                    Spacer(Modifier.width(dimens.iconSpacing))
                     Box(
-                        modifier = Modifier.size(SecondaryButtonDefaults.IconSize),
+                        modifier = Modifier.size(dimens.iconSize),
                         contentAlignment = Alignment.Center,
                     ) { icon() }
                 }
@@ -119,8 +141,158 @@ private fun SecondaryButtonPreview() {
             .padding(16.dp)
     ) {
         SecondaryButton(
-            text = "Cancel",
+            state = SecondaryButtonState(text = "Cancel"),
             onClick = {},
         )
     }
+}
+
+/**
+ * Default configuration values for [SecondaryButton].
+ *
+ * Provides theme-aware defaults for [colors], [style], and [dimens] that can be overridden.
+ */
+object SecondaryButtonDefaults {
+
+    /**
+     * Color configuration for [SecondaryButton].
+     *
+     * @param container Background color when enabled.
+     * @param content Text and icon color when enabled.
+     * @param disabledContainer Background color when disabled.
+     * @param disabledContent Text and icon color when disabled.
+     */
+    data class SecondaryButtonColors(
+        val container: Color,
+        val content: Color,
+        val disabledContainer: Color,
+        val disabledContent: Color
+    ) {
+        fun containerColor(enabled: Boolean): Color =
+            if (enabled) container else disabledContainer
+
+        fun contentColor(enabled: Boolean): Color =
+            if (enabled) content else disabledContent
+    }
+
+    @Composable
+    fun colors(
+        container: Color = System.color.backgroundTertiary,
+        content: Color = System.color.textBase,
+        disabledContainer: Color = System.color.backgroundTertiary.copy(alpha = 0.5f),
+        disabledContent: Color = System.color.textSubtle
+    ) = SecondaryButtonColors(
+        container = container,
+        content = content,
+        disabledContainer = disabledContainer,
+        disabledContent = disabledContent
+    )
+
+    /**
+     * Text style configuration for [SecondaryButton].
+     *
+     * @param small Style for small button size.
+     * @param medium Style for medium button size.
+     * @param large Style for large button size.
+     */
+    data class SecondaryButtonStyle(
+        val small: TextStyle,
+        val medium: TextStyle,
+        val large: TextStyle
+    ) {
+        fun textStyle(size: ButtonSize): TextStyle = when (size) {
+            ButtonSize.Small -> small
+            ButtonSize.Medium -> medium
+            ButtonSize.Large -> large
+        }
+    }
+
+    @Composable
+    fun style(
+        small: TextStyle = System.font.body.small.medium,
+        medium: TextStyle = System.font.body.base.medium,
+        large: TextStyle = System.font.body.large.medium
+    ) = SecondaryButtonStyle(
+        small = small,
+        medium = medium,
+        large = large
+    )
+
+    /**
+     * Dimension configuration for [SecondaryButton].
+     *
+     * @param shape Button shape.
+     * @param iconSize Icon dimensions for leading/trailing slots.
+     * @param iconSpacing Spacing between icon and text.
+     * @param smallMinWidth Minimum width for small size.
+     * @param smallMinHeight Minimum height for small size.
+     * @param smallContentPadding Content padding for small size.
+     * @param mediumMinWidth Minimum width for medium size.
+     * @param mediumMinHeight Minimum height for medium size.
+     * @param mediumContentPadding Content padding for medium size.
+     * @param largeMinWidth Minimum width for large size.
+     * @param largeMinHeight Minimum height for large size.
+     * @param largeContentPadding Content padding for large size.
+     */
+    data class SecondaryButtonDimens(
+        val shape: Shape,
+        val iconSize: Dp,
+        val iconSpacing: Dp,
+        val smallMinWidth: Dp,
+        val smallMinHeight: Dp,
+        val smallContentPadding: PaddingValues,
+        val mediumMinWidth: Dp,
+        val mediumMinHeight: Dp,
+        val mediumContentPadding: PaddingValues,
+        val largeMinWidth: Dp,
+        val largeMinHeight: Dp,
+        val largeContentPadding: PaddingValues
+    ) {
+        fun minWidth(size: ButtonSize): Dp = when (size) {
+            ButtonSize.Small -> smallMinWidth
+            ButtonSize.Medium -> mediumMinWidth
+            ButtonSize.Large -> largeMinWidth
+        }
+
+        fun minHeight(size: ButtonSize): Dp = when (size) {
+            ButtonSize.Small -> smallMinHeight
+            ButtonSize.Medium -> mediumMinHeight
+            ButtonSize.Large -> largeMinHeight
+        }
+
+        fun contentPadding(size: ButtonSize): PaddingValues = when (size) {
+            ButtonSize.Small -> smallContentPadding
+            ButtonSize.Medium -> mediumContentPadding
+            ButtonSize.Large -> largeContentPadding
+        }
+    }
+
+    @Composable
+    fun dimens(
+        shape: Shape = RoundedCornerShape(16.dp),
+        iconSize: Dp = 20.dp,
+        iconSpacing: Dp = 8.dp,
+        smallMinWidth: Dp = 80.dp,
+        smallMinHeight: Dp = 40.dp,
+        smallContentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+        mediumMinWidth: Dp = 120.dp,
+        mediumMinHeight: Dp = 52.dp,
+        mediumContentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
+        largeMinWidth: Dp = 160.dp,
+        largeMinHeight: Dp = 60.dp,
+        largeContentPadding: PaddingValues = PaddingValues(horizontal = 32.dp, vertical = 18.dp)
+    ) = SecondaryButtonDimens(
+        shape = shape,
+        iconSize = iconSize,
+        iconSpacing = iconSpacing,
+        smallMinWidth = smallMinWidth,
+        smallMinHeight = smallMinHeight,
+        smallContentPadding = smallContentPadding,
+        mediumMinWidth = mediumMinWidth,
+        mediumMinHeight = mediumMinHeight,
+        mediumContentPadding = mediumContentPadding,
+        largeMinWidth = largeMinWidth,
+        largeMinHeight = largeMinHeight,
+        largeContentPadding = largeContentPadding
+    )
 }

@@ -5,6 +5,170 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-02-09
+
+### Breaking Changes
+
+This is a major release with breaking API changes. All components now follow a consistent **State/Defaults pattern** for improved type safety, discoverability, and consistency.
+
+#### State Pattern
+
+All components with 2+ data properties now use a dedicated `State` data class:
+
+```kotlin
+// Before (1.x)
+PrimaryButton(
+    text = "Continue",
+    enabled = true,
+    loading = false,
+    onClick = { /* action */ },
+)
+
+// After (2.0)
+PrimaryButton(
+    state = PrimaryButtonState(
+        text = "Continue",
+        enabled = true,
+        loading = false,
+    ),
+    onClick = { /* action */ },
+)
+```
+
+#### Effect Pattern for Sheets
+
+All sheets now use sealed `Effect` interfaces instead of multiple callbacks:
+
+```kotlin
+// Before (1.x)
+ConfirmationSheet(
+    isVisible = showSheet,
+    onDismiss = { hideSheet() },
+    onConfirm = { confirm() },
+)
+
+// After (2.0)
+ConfirmationSheet(
+    state = ConfirmationSheetState(
+        isVisible = showSheet,
+        title = "Confirm",
+        message = "Are you sure?",
+    ),
+    onEffect = { effect ->
+        when (effect) {
+            ConfirmationSheetEffect.Dismiss -> hideSheet()
+            ConfirmationSheetEffect.Confirm -> confirm()
+        }
+    },
+)
+```
+
+### Added
+
+#### New State Classes
+
+| Component | State Class |
+|-----------|-------------|
+| `PrimaryButton` | `PrimaryButtonState` |
+| `SecondaryButton` | `SecondaryButtonState` |
+| `GenderButton` | `GenderButtonState` |
+| `DotsIndicator` | `DotsIndicatorState` |
+| `PinRow` | `PinRowState` |
+| `PinView` | `PinViewState` |
+| `LocationPin` | `LocationPinState` |
+| `AddressCard` | `AddressCardState` |
+| `BonusCard` | `BonusCardState` |
+| `EnableBonusCard` | `EnableBonusCardState` |
+| `HistoryCard` | `HistoryCardState` |
+| `NotificationCard` | `NotificationCardState` |
+| `ProfileCard` | `ProfileCardState` |
+| `SwitchCard` | `SwitchCardState` |
+| `LocationItem` | `LocationItemState` |
+| `RadioItem` | `RadioItemState` |
+| `SelectableItem` | `SelectableItemState<T>` |
+| `ServiceItem` | `ServiceItemState` |
+| `ActionSheet` | `ActionSheetState` |
+| `ActionPickerSheet` | `ActionPickerSheetState` |
+| `ConfirmationSheet` | `ConfirmationSheetState` |
+| `DatePickerSheet` | `DatePickerSheetState` |
+| `EmptyState` | `EmptyStateState` |
+| `CarNumber` | `CarNumberState` |
+| `VehiclePlate` | `VehiclePlateState` |
+| `LocationPoint` | `LocationPointState` |
+| `RouteView` | `RouteViewState` |
+| `Snackbar` | `SnackbarState` |
+
+#### New Effect Interfaces
+
+| Sheet | Effect Interface |
+|-------|------------------|
+| `ActionSheet` | `ActionSheetEffect` |
+| `ActionPickerSheet` | `ActionPickerSheetEffect` |
+| `ConfirmationSheet` | `ConfirmationSheetEffect` |
+| `DatePickerSheet` | `DatePickerSheetEffect` |
+
+#### New Defaults Objects
+
+Every component now has a `ComponentNameDefaults` object with:
+- `Colors` data class with `@Composable colors()` factory
+- `Style` data class with `@Composable style()` factory
+- `Dimens` data class with `@Composable dimens()` factory
+
+### Changed
+
+- **Package Structure**: Reorganized from `section/` to `composite/` for better semantic clarity
+  - `section/card/` → `composite/card/`
+  - `section/item/` → `composite/item/`
+  - `section/sheet/` → `composite/sheet/`
+  - `section/view/` → `composite/view/`
+  - `feedback/` → Distributed to appropriate packages
+
+- **Sheet Components**: All sheets now have `isVisible` inside their State class instead of as a separate parameter
+
+- **Snackbar**: Renamed from `PrimarySnackBar` to `Snackbar` with new `SnackbarState`
+
+### Removed
+
+- Deprecated dual-API patterns (old parameter-based APIs removed in favor of State-only APIs)
+- `feedback/` package (contents moved to `composite/` and `primitive/`)
+- `section/` package (renamed to `composite/`)
+
+### Migration Guide
+
+1. **Update imports**: Change `section.*` to `composite.*`
+2. **Wrap parameters in State**: Bundle data parameters into the component's State class
+3. **Use Effect handlers**: Replace multiple callbacks with single `onEffect` handler for sheets
+4. **Check Defaults**: Use the new Defaults objects for customization
+
+## [1.3.0] - 2026-02-09
+
+### Added
+
+- **DataError** - Sealed class hierarchy for network/data layer errors
+- **BaseViewModel** - Added `DataError` to `StringResource` mapping, `currentErrorMessageId`, and `failure` flow
+
+### Changed
+
+- **BaseViewModel** - Now uses `StringResource` for error messages instead of plain strings
+
+## [1.2.2] - 2026-02-08
+
+### Changed
+
+- **ExpandableSheetState** - Exposed `anchoredDraggableState`, `snapAnimationSpec`, `positionalThreshold`, `contentHeightPx`, `updateHeights()`, and `settle()` as public API for custom sheet implementations
+
+## [1.2.1] - 2026-02-08
+
+### Changed
+
+- **ExpandableSheetState** - Added `positionalThreshold` parameter for customizing fling snap behavior
+
+## [1.2.0] - 2026-02-08
+
+### Added
+
+- **ActionPickerSheet** - New sheet component for selecting from multiple action items with icons. Use for action menus, option pickers, and context actions.
+
 ## [1.1.1] - 2026-02-08
 
 ### Fixed

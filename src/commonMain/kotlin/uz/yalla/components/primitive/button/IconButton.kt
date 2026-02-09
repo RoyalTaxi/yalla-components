@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -13,7 +12,19 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import uz.yalla.components.model.common.ButtonSize
 import uz.yalla.design.theme.System
+
+/**
+ * State for [IconButton] component.
+ *
+ * @property enabled When false, button is disabled.
+ * @property size Button size variant.
+ */
+data class IconButtonState(
+    val enabled: Boolean = true,
+    val size: ButtonSize = ButtonSize.Medium
+)
 
 /**
  * Icon-only button for compact actions.
@@ -24,37 +35,38 @@ import uz.yalla.design.theme.System
  *
  * ```kotlin
  * IconButton(
+ *     state = IconButtonState(),
  *     onClick = onClose,
  * ) {
  *     Icon(Icons.Default.Close, contentDescription = "Close")
  * }
  * ```
  *
- * @param onClick Invoked on click
- * @param modifier Applied to button
- * @param enabled When false, button is disabled
- * @param size Button size
- * @param colors Color configuration
- * @param content Icon content
+ * @param state Button state containing enabled and size.
+ * @param onClick Invoked on click.
+ * @param modifier Applied to button.
+ * @param colors Color configuration, defaults to [IconButtonDefaults.colors].
+ * @param dimens Dimension configuration, defaults to [IconButtonDefaults.dimens].
+ * @param content Icon content.
  *
  * @see IconButtonDefaults for default values
  */
 @Composable
 fun IconButton(
+    state: IconButtonState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    size: IconButtonSize = IconButtonSize.Medium,
-    colors: IconButtonDefaults.Colors = IconButtonDefaults.colors(),
+    colors: IconButtonDefaults.IconButtonColors = IconButtonDefaults.colors(),
+    dimens: IconButtonDefaults.IconButtonDimens = IconButtonDefaults.dimens(),
     content: @Composable () -> Unit,
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.size(IconButtonDefaults.size(size)),
-        enabled = enabled,
-        shape = IconButtonDefaults.Shape,
-        color = colors.containerColor(enabled),
-        contentColor = colors.contentColor(enabled),
+        modifier = modifier.size(dimens.size(state.size)),
+        enabled = state.enabled,
+        shape = dimens.shape,
+        color = colors.containerColor(state.enabled),
+        contentColor = colors.contentColor(state.enabled),
     ) {
         Box(contentAlignment = Alignment.Center) {
             content()
@@ -63,32 +75,31 @@ fun IconButton(
 }
 
 /**
- * Size variants for [IconButton].
- */
-enum class IconButtonSize {
-    Small,
-    Medium,
-    Large,
-}
-
-/**
- * Default values for [IconButton].
+ * Default configuration values for [IconButton].
+ *
+ * Provides theme-aware defaults for [colors] and [dimens] that can be overridden.
  */
 object IconButtonDefaults {
 
-    val CornerRadius: Dp = 12.dp
-    val Shape: Shape = RoundedCornerShape(CornerRadius)
+    /**
+     * Color configuration for [IconButton].
+     *
+     * @param container Background color when enabled.
+     * @param content Icon color when enabled.
+     * @param disabledContainer Background color when disabled.
+     * @param disabledContent Icon color when disabled.
+     */
+    data class IconButtonColors(
+        val container: Color,
+        val content: Color,
+        val disabledContainer: Color,
+        val disabledContent: Color,
+    ) {
+        fun containerColor(enabled: Boolean): Color =
+            if (enabled) container else disabledContainer
 
-    fun size(size: IconButtonSize): Dp = when (size) {
-        IconButtonSize.Small -> 36.dp
-        IconButtonSize.Medium -> 44.dp
-        IconButtonSize.Large -> 52.dp
-    }
-
-    fun iconSize(size: IconButtonSize): Dp = when (size) {
-        IconButtonSize.Small -> 18.dp
-        IconButtonSize.Medium -> 22.dp
-        IconButtonSize.Large -> 26.dp
+        fun contentColor(enabled: Boolean): Color =
+            if (enabled) content else disabledContent
     }
 
     @Composable
@@ -97,7 +108,7 @@ object IconButtonDefaults {
         content: Color = System.color.iconBase,
         disabledContainer: Color = System.color.backgroundTertiary.copy(alpha = 0.5f),
         disabledContent: Color = System.color.iconDisabled,
-    ): Colors = Colors(
+    ) = IconButtonColors(
         container = container,
         content = content,
         disabledContainer = disabledContainer,
@@ -110,7 +121,7 @@ object IconButtonDefaults {
         content: Color = System.color.iconWhite,
         disabledContainer: Color = System.color.buttonDisabled,
         disabledContent: Color = System.color.iconWhite,
-    ): Colors = Colors(
+    ) = IconButtonColors(
         container = container,
         content = content,
         disabledContainer = disabledContainer,
@@ -118,27 +129,69 @@ object IconButtonDefaults {
     )
 
     /**
-     * Color configuration for [IconButton].
+     * Dimension configuration for [IconButton].
+     *
+     * @param smallSize Button size for small variant.
+     * @param mediumSize Button size for medium variant.
+     * @param largeSize Button size for large variant.
+     * @param smallIconSize Icon size for small variant.
+     * @param mediumIconSize Icon size for medium variant.
+     * @param largeIconSize Icon size for large variant.
+     * @param cornerRadius Corner radius of the button shape.
+     * @param shape Button shape.
      */
-    @Immutable
-    data class Colors(
-        val container: Color,
-        val content: Color,
-        val disabledContainer: Color,
-        val disabledContent: Color,
+    data class IconButtonDimens(
+        val smallSize: Dp,
+        val mediumSize: Dp,
+        val largeSize: Dp,
+        val smallIconSize: Dp,
+        val mediumIconSize: Dp,
+        val largeIconSize: Dp,
+        val cornerRadius: Dp,
+        val shape: Shape,
     ) {
-        fun containerColor(enabled: Boolean): Color =
-            if (enabled) container else disabledContainer
+        fun size(size: ButtonSize): Dp = when (size) {
+            ButtonSize.Small -> smallSize
+            ButtonSize.Medium -> mediumSize
+            ButtonSize.Large -> largeSize
+        }
 
-        fun contentColor(enabled: Boolean): Color =
-            if (enabled) content else disabledContent
+        fun iconSize(size: ButtonSize): Dp = when (size) {
+            ButtonSize.Small -> smallIconSize
+            ButtonSize.Medium -> mediumIconSize
+            ButtonSize.Large -> largeIconSize
+        }
     }
+
+    @Composable
+    fun dimens(
+        smallSize: Dp = 36.dp,
+        mediumSize: Dp = 44.dp,
+        largeSize: Dp = 52.dp,
+        smallIconSize: Dp = 18.dp,
+        mediumIconSize: Dp = 22.dp,
+        largeIconSize: Dp = 26.dp,
+        cornerRadius: Dp = 12.dp,
+        shape: Shape = RoundedCornerShape(cornerRadius),
+    ) = IconButtonDimens(
+        smallSize = smallSize,
+        mediumSize = mediumSize,
+        largeSize = largeSize,
+        smallIconSize = smallIconSize,
+        mediumIconSize = mediumIconSize,
+        largeIconSize = largeIconSize,
+        cornerRadius = cornerRadius,
+        shape = shape,
+    )
 }
 
 @Preview
 @Composable
 private fun IconButtonPreview() {
-    IconButton(onClick = {}) {
+    IconButton(
+        state = IconButtonState(),
+        onClick = {}
+    ) {
         Box(Modifier.size(22.dp))
     }
 }

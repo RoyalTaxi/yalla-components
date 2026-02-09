@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +35,8 @@ import uz.yalla.design.theme.System
  * @param onDismissRequest Called when user tries to dismiss (optional).
  * @param dismissOnBackPress Whether back press dismisses dialog.
  * @param dismissOnClickOutside Whether clicking outside dismisses dialog.
- * @param colors Color configuration.
+ * @param colors Color configuration, defaults to [LoadingDialogDefaults.colors].
+ * @param dimens Dimension configuration, defaults to [LoadingDialogDefaults.dimens].
  *
  * @see LoadingDialogDefaults for default values
  */
@@ -46,7 +46,8 @@ fun LoadingDialog(
     onDismissRequest: () -> Unit = {},
     dismissOnBackPress: Boolean = false,
     dismissOnClickOutside: Boolean = false,
-    colors: LoadingDialogDefaults.Colors = LoadingDialogDefaults.colors(),
+    colors: LoadingDialogDefaults.LoadingDialogColors = LoadingDialogDefaults.colors(),
+    dimens: LoadingDialogDefaults.LoadingDialogDimens = LoadingDialogDefaults.dimens(),
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -57,40 +58,37 @@ fun LoadingDialog(
     ) {
         Box(
             modifier = modifier
-                .size(LoadingDialogDefaults.Size)
+                .size(dimens.size)
                 .background(
                     color = colors.container,
-                    shape = LoadingDialogDefaults.Shape,
+                    shape = dimens.shape,
                 )
-                .padding(LoadingDialogDefaults.ContentPadding),
+                .padding(dimens.contentPadding),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator(
-                modifier = Modifier.size(LoadingDialogDefaults.IndicatorSize),
+                modifier = Modifier.size(dimens.indicatorSize),
                 color = colors.indicator,
-                strokeWidth = LoadingDialogDefaults.StrokeWidth,
+                strokeWidth = dimens.strokeWidth,
             )
         }
     }
 }
 
 /**
- * Default values for [LoadingDialog].
+ * Default configuration values for [LoadingDialog].
+ *
+ * Provides theme-aware defaults for [colors] and [dimens] that can be overridden.
  */
 object LoadingDialogDefaults {
 
-    val Size: Dp = 100.dp
-    val IndicatorSize: Dp = 48.dp
-    val StrokeWidth: Dp = 4.dp
-    val CornerRadius: Dp = 16.dp
-    val Shape: Shape = RoundedCornerShape(CornerRadius)
-    val ContentPadding: Dp = 24.dp
-
     /**
      * Color configuration for [LoadingDialog].
+     *
+     * @param container Background color.
+     * @param indicator Spinner color.
      */
-    @Immutable
-    data class Colors(
+    data class LoadingDialogColors(
         val container: Color,
         val indicator: Color,
     )
@@ -99,9 +97,45 @@ object LoadingDialogDefaults {
     fun colors(
         container: Color = System.color.backgroundBase,
         indicator: Color = System.color.buttonActive,
-    ): Colors = Colors(
+    ) = LoadingDialogColors(
         container = container,
         indicator = indicator,
+    )
+
+    /**
+     * Dimension configuration for [LoadingDialog].
+     *
+     * @param size Dialog box size.
+     * @param indicatorSize Spinner size.
+     * @param strokeWidth Spinner stroke width.
+     * @param cornerRadius Corner radius.
+     * @param contentPadding Padding inside dialog.
+     * @param shape Dialog shape.
+     */
+    data class LoadingDialogDimens(
+        val size: Dp,
+        val indicatorSize: Dp,
+        val strokeWidth: Dp,
+        val cornerRadius: Dp,
+        val contentPadding: Dp,
+        val shape: Shape,
+    )
+
+    @Composable
+    fun dimens(
+        size: Dp = 100.dp,
+        indicatorSize: Dp = 48.dp,
+        strokeWidth: Dp = 4.dp,
+        cornerRadius: Dp = 16.dp,
+        contentPadding: Dp = 24.dp,
+        shape: Shape = RoundedCornerShape(cornerRadius),
+    ) = LoadingDialogDimens(
+        size = size,
+        indicatorSize = indicatorSize,
+        strokeWidth = strokeWidth,
+        cornerRadius = cornerRadius,
+        contentPadding = contentPadding,
+        shape = shape,
     )
 }
 

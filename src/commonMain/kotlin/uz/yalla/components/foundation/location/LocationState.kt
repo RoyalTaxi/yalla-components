@@ -1,14 +1,11 @@
 package uz.yalla.components.foundation.location
 
-import androidx.compose.runtime.Immutable
-
 /**
  * Represents a geographic location with latitude and longitude coordinates.
  *
  * @property latitude Latitude in degrees (-90 to 90)
  * @property longitude Longitude in degrees (-180 to 180)
  */
-@Immutable
 data class MapPoint(
     val latitude: Double,
     val longitude: Double,
@@ -33,7 +30,6 @@ data class MapPoint(
  * @property bearing Bearing in degrees (if available)
  * @property timestamp Timestamp when location was captured
  */
-@Immutable
 data class ExtendedLocation(
     val latitude: Double,
     val longitude: Double,

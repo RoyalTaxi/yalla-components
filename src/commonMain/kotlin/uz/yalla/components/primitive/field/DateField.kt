@@ -19,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +28,21 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
 import androidx.compose.ui.tooling.preview.Preview
 import uz.yalla.design.theme.System
+
+/**
+ * State for [DateField] component.
+ *
+ * @property date Currently selected date, or null if none.
+ * @property placeholder Text shown when no date selected.
+ * @property enabled When false, field is not clickable.
+ * @property borderStroke Optional border around field.
+ */
+data class DateFieldState(
+    val date: LocalDate?,
+    val placeholder: String = "DD.MM.YYYY",
+    val enabled: Boolean = true,
+    val borderStroke: BorderStroke? = null
+)
 
 /**
  * Read-only date field that opens a date picker on click.
@@ -42,60 +56,58 @@ import uz.yalla.design.theme.System
  * var showPicker by remember { mutableStateOf(false) }
  *
  * DateField(
- *     date = selectedDate,
- *     placeholder = "Select date",
+ *     state = DateFieldState(
+ *         date = selectedDate,
+ *         placeholder = "Select date"
+ *     ),
  *     onClick = { showPicker = true },
  * )
  * ```
  *
- * @param date Currently selected date, or null if none.
+ * @param state Field state containing date, placeholder, enabled, and borderStroke.
  * @param onClick Invoked when field is clicked (open picker).
  * @param modifier Applied to field container.
- * @param placeholder Text shown when no date selected.
- * @param enabled When false, field is not clickable.
- * @param borderStroke Optional border around field.
- * @param colors Color configuration.
+ * @param colors Color configuration, defaults to [DateFieldDefaults.colors].
+ * @param dimens Dimension configuration, defaults to [DateFieldDefaults.dimens].
  *
  * @see DateFieldDefaults for default values
  */
 @Composable
 fun DateField(
-    date: LocalDate?,
+    state: DateFieldState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "DD.MM.YYYY",
-    enabled: Boolean = true,
-    borderStroke: BorderStroke? = null,
-    colors: DateFieldDefaults.Colors = DateFieldDefaults.colors(),
+    colors: DateFieldDefaults.DateFieldColors = DateFieldDefaults.colors(),
+    dimens: DateFieldDefaults.DateFieldDimens = DateFieldDefaults.dimens(),
 ) {
     Surface(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = DateFieldDefaults.MinHeight),
-        enabled = enabled,
-        shape = DateFieldDefaults.Shape,
+            .defaultMinSize(minHeight = dimens.minHeight),
+        enabled = state.enabled,
+        shape = dimens.shape,
         color = colors.container,
-        border = borderStroke,
+        border = state.borderStroke,
     ) {
         Row(
-            modifier = Modifier.padding(DateFieldDefaults.ContentPadding),
+            modifier = Modifier.padding(dimens.contentPadding),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = Icons.Default.DateRange,
                 contentDescription = null,
-                modifier = Modifier.size(DateFieldDefaults.IconSize),
+                modifier = Modifier.size(dimens.iconSize),
                 tint = colors.icon,
             )
 
-            Spacer(Modifier.width(DateFieldDefaults.IconSpacing))
+            Spacer(Modifier.width(dimens.iconSpacing))
 
             Text(
-                text = date?.formatDisplay() ?: placeholder,
+                text = state.date?.formatDisplay() ?: state.placeholder,
                 style = System.font.body.base.regular,
-                color = if (date != null) colors.text else colors.placeholder,
+                color = if (state.date != null) colors.text else colors.placeholder,
             )
         }
     }
@@ -111,24 +123,20 @@ private fun LocalDate.formatDisplay(): String =
 
 /**
  * Default values for [DateField].
+ *
+ * Provides theme-aware defaults for [colors] and [dimens] that can be overridden.
  */
 object DateFieldDefaults {
 
-    val MinHeight: Dp = 56.dp
-    val CornerRadius: Dp = 12.dp
-    val Shape: Shape = RoundedCornerShape(CornerRadius)
-    val IconSize: Dp = 24.dp
-    val IconSpacing: Dp = 12.dp
-    val ContentPadding: PaddingValues = PaddingValues(
-        horizontal = 16.dp,
-        vertical = 16.dp,
-    )
-
     /**
      * Color configuration for [DateField].
+     *
+     * @param container Background color.
+     * @param text Selected date text color.
+     * @param placeholder Placeholder text color.
+     * @param icon Calendar icon color.
      */
-    @Immutable
-    data class Colors(
+    data class DateFieldColors(
         val container: Color,
         val text: Color,
         val placeholder: Color,
@@ -141,11 +149,46 @@ object DateFieldDefaults {
         text: Color = System.color.textBase,
         placeholder: Color = System.color.textSubtle,
         icon: Color = System.color.iconSecondary,
-    ): Colors = Colors(
+    ): DateFieldColors = DateFieldColors(
         container = container,
         text = text,
         placeholder = placeholder,
         icon = icon,
+    )
+
+    /**
+     * Dimension configuration for [DateField].
+     *
+     * @param minHeight Minimum height of the field.
+     * @param shape Corner shape of the field.
+     * @param iconSize Size of the calendar icon.
+     * @param iconSpacing Spacing between icon and text.
+     * @param contentPadding Padding inside the field.
+     */
+    data class DateFieldDimens(
+        val minHeight: Dp,
+        val shape: Shape,
+        val iconSize: Dp,
+        val iconSpacing: Dp,
+        val contentPadding: PaddingValues,
+    )
+
+    @Composable
+    fun dimens(
+        minHeight: Dp = 56.dp,
+        shape: Shape = RoundedCornerShape(12.dp),
+        iconSize: Dp = 24.dp,
+        iconSpacing: Dp = 12.dp,
+        contentPadding: PaddingValues = PaddingValues(
+            horizontal = 16.dp,
+            vertical = 16.dp,
+        ),
+    ): DateFieldDimens = DateFieldDimens(
+        minHeight = minHeight,
+        shape = shape,
+        iconSize = iconSize,
+        iconSpacing = iconSpacing,
+        contentPadding = contentPadding,
     )
 }
 
@@ -158,7 +201,7 @@ private fun DateFieldPreview() {
             .padding(16.dp)
     ) {
         DateField(
-            date = null,
+            state = DateFieldState(date = null),
             onClick = {},
         )
     }

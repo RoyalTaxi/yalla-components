@@ -5,12 +5,26 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.plus
+import kotlin.time.Duration
+import org.jetbrains.compose.resources.StringResource
+import uz.yalla.components.foundation.error.DataError
+import uz.yalla.resources.Res
+import uz.yalla.resources.error_client_request
+import uz.yalla.resources.error_connection_timeout
+import uz.yalla.resources.error_data_format
+import uz.yalla.resources.error_network_unexpected
+import uz.yalla.resources.error_no_internet
+import uz.yalla.resources.error_server_busy
+import uz.yalla.resources.error_session_expired
+import uz.yalla.resources.error_unexpected
+import uz.yalla.resources.error_unexpected_redirect
 
 /**
  * Base ViewModel providing common functionality for all ViewModels.
@@ -19,6 +33,7 @@ import kotlin.coroutines.CoroutineContext
  * - Smart loading state management via [LoadingController]
  * - Centralized exception handling with error dialog support
  * - Safe coroutine scope with automatic error handling
+ * - DataError to StringResource mapping
  *
  * ## Usage
  *
@@ -46,62 +61,49 @@ abstract class BaseViewModel : ViewModel() {
     /** Loading state flow. Observe to show/hide loading indicators. */
     val loading: StateFlow<Boolean> = loadingController.loading
 
+    private val _failure = Channel<Int>(Channel.UNLIMITED)
+
+    /** Flow of failure codes for external observation. */
+    val failure: Flow<Int> = _failure.receiveAsFlow()
+
     private val _showErrorDialog = MutableStateFlow(false)
 
     /** Whether error dialog should be visible. */
     val showErrorDialog: StateFlow<Boolean> = _showErrorDialog.asStateFlow()
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
+    private val _currentErrorMessageId = MutableStateFlow<StringResource?>(null)
 
-    /** Current error message to display in dialog. */
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    /** Current error message resource to display in dialog. */
+    val currentErrorMessageId: StateFlow<StringResource?> = _currentErrorMessageId.asStateFlow()
 
-    private val failureChannel = Channel<Throwable>(Channel.BUFFERED)
-
-    /** Flow of unhandled exceptions for external observation. */
-    val failures = failureChannel.receiveAsFlow()
-
-    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        handleException(throwable)
+    private val handler = CoroutineExceptionHandler { _, e ->
+        val messageId = mapThrowableToUserMessage(e)
+        _currentErrorMessageId.tryEmit(messageId)
+        _showErrorDialog.tryEmit(true)
     }
 
     /**
      * Safe coroutine scope with automatic exception handling.
      *
-     * Exceptions thrown in this scope are caught and passed to [handleException].
+     * Exceptions thrown in this scope are caught and mapped to user-friendly messages.
      */
-    protected val safeScope: CoroutineContext
-        get() = viewModelScope.coroutineContext + exceptionHandler
+    val safeScope: CoroutineScope = viewModelScope + handler
 
     /**
-     * Handles uncaught exceptions by showing error dialog.
-     *
-     * Override to customize error handling behavior.
+     * Handles exception by showing error dialog with mapped message.
      *
      * @param throwable The exception that occurred
      */
-    protected open fun handleException(throwable: Throwable) {
-        _errorMessage.value = throwable.message ?: "An unexpected error occurred"
-        _showErrorDialog.value = true
-        viewModelScope.launch {
-            failureChannel.send(throwable)
-        }
-    }
-
-    /**
-     * Shows error dialog with specified message.
-     *
-     * @param message Error message to display
-     */
-    protected fun showError(message: String) {
-        _errorMessage.value = message
-        _showErrorDialog.value = true
+    fun handleException(throwable: Throwable) {
+        val messageId = mapThrowableToUserMessage(throwable)
+        _currentErrorMessageId.tryEmit(messageId)
+        _showErrorDialog.tryEmit(true)
     }
 
     /** Dismisses the currently shown error dialog. */
     fun dismissErrorDialog() {
-        _showErrorDialog.value = false
-        _errorMessage.value = null
+        _showErrorDialog.tryEmit(false)
+        _currentErrorMessageId.tryEmit(null)
     }
 
     /**
@@ -109,12 +111,16 @@ abstract class BaseViewModel : ViewModel() {
      *
      * Loading indicator appears after delay and stays visible for minimum time.
      *
+     * @param showAfter Delay before showing loading. Defaults to controller's configured value.
+     * @param minDisplayTime Minimum display time once shown. Defaults to controller's configured value.
      * @param block Suspending operation to execute
      */
-    protected fun CoroutineScope.launchWithLoading(
+    fun CoroutineScope.launchWithLoading(
+        showAfter: Duration = LoadingController.DEFAULT_SHOW_AFTER,
+        minDisplayTime: Duration = LoadingController.DEFAULT_MIN_DISPLAY_TIME,
         block: suspend () -> Unit,
-    ) = launch(exceptionHandler) {
-        loadingController.withLoading { block() }
+    ) = launch {
+        loadingController.withLoading(showAfter, minDisplayTime, block)
     }
 
     /**
@@ -122,7 +128,28 @@ abstract class BaseViewModel : ViewModel() {
      *
      * @param block Suspending operation to execute
      */
-    protected fun CoroutineScope.launchSafe(
-        block: suspend () -> Unit,
-    ) = launch(exceptionHandler) { block() }
+    fun CoroutineScope.launchSafe(block: suspend () -> Unit) = launch(handler) {
+        block()
+    }
+
+    /**
+     * Maps throwable to user-friendly message resource.
+     *
+     * Override to customize error mapping for app-specific error types.
+     *
+     * @param throwable The exception to map
+     * @return StringResource for the error message
+     */
+    protected open fun mapThrowableToUserMessage(throwable: Throwable): StringResource =
+        when (throwable) {
+            DataError.Network.NO_INTERNET_ERROR -> Res.string.error_no_internet
+            DataError.Network.SOCKET_TIME_OUT_ERROR -> Res.string.error_connection_timeout
+            DataError.Network.UNAUTHORIZED_ERROR -> Res.string.error_session_expired
+            DataError.Network.CLIENT_REQUEST_ERROR -> Res.string.error_client_request
+            DataError.Network.SERVER_RESPONSE_ERROR -> Res.string.error_server_busy
+            DataError.Network.REDIRECT_RESPONSE_ERROR -> Res.string.error_unexpected_redirect
+            DataError.Network.SERIALIZATION_ERROR -> Res.string.error_data_format
+            DataError.Network.UNKNOWN_ERROR -> Res.string.error_network_unexpected
+            else -> Res.string.error_unexpected
+        }
 }

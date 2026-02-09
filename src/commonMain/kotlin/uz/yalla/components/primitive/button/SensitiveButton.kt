@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +35,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import uz.yalla.design.theme.System
 
 /**
+ * State for [SensitiveButton] component.
+ *
+ * @property text Button label.
+ * @property enabled When false, button is disabled.
+ */
+data class SensitiveButtonState(
+    val text: String,
+    val enabled: Boolean = true
+)
+
+/**
  * Countdown confirmation button for destructive or sensitive actions.
  *
  * Requires user to hold the button for a duration before action executes.
@@ -46,28 +57,28 @@ import uz.yalla.design.theme.System
  *
  * ```kotlin
  * SensitiveButton(
- *     text = "Delete Account",
+ *     state = SensitiveButtonState(text = "Delete Account"),
  *     onConfirm = viewModel::deleteAccount,
  * )
  * ```
  *
- * @param text Button label.
+ * @param state Button state containing text and enabled.
  * @param onConfirm Invoked when hold duration completes.
  * @param modifier Applied to button.
- * @param enabled When false, button is disabled.
- * @param holdDurationMs Time to hold in milliseconds.
- * @param colors Color configuration.
+ * @param colors Color configuration, defaults to [SensitiveButtonDefaults.colors].
+ * @param style Text style configuration, defaults to [SensitiveButtonDefaults.style].
+ * @param dimens Dimension configuration, defaults to [SensitiveButtonDefaults.dimens].
  *
  * @see SensitiveButtonDefaults for default values
  */
 @Composable
 fun SensitiveButton(
-    text: String,
+    state: SensitiveButtonState,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    holdDurationMs: Int = SensitiveButtonDefaults.HoldDurationMs,
-    colors: SensitiveButtonDefaults.Colors = SensitiveButtonDefaults.colors(),
+    colors: SensitiveButtonDefaults.SensitiveButtonColors = SensitiveButtonDefaults.colors(),
+    style: SensitiveButtonDefaults.SensitiveButtonStyle = SensitiveButtonDefaults.style(),
+    dimens: SensitiveButtonDefaults.SensitiveButtonDimens = SensitiveButtonDefaults.dimens(),
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
@@ -84,12 +95,12 @@ fun SensitiveButton(
 
     Box(
         modifier = modifier
-            .defaultMinSize(minHeight = SensitiveButtonDefaults.MinHeight)
+            .defaultMinSize(minHeight = dimens.minHeight)
             .fillMaxWidth()
-            .clip(SensitiveButtonDefaults.Shape)
-            .background(colors.containerColor(enabled))
-            .pointerInput(enabled) {
-                if (!enabled) return@pointerInput
+            .clip(dimens.shape)
+            .background(colors.containerColor(state.enabled))
+            .pointerInput(state.enabled) {
+                if (!state.enabled) return@pointerInput
 
                 detectTapGestures(
                     onPress = {
@@ -98,7 +109,7 @@ fun SensitiveButton(
                             progress.animateTo(
                                 targetValue = 1f,
                                 animationSpec = tween(
-                                    durationMillis = holdDurationMs,
+                                    durationMillis = dimens.holdDurationMs,
                                     easing = LinearEasing,
                                 ),
                             )
@@ -118,7 +129,7 @@ fun SensitiveButton(
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .clip(SensitiveButtonDefaults.Shape)
+                .clip(dimens.shape)
                 .background(
                     color = colors.progress.copy(
                         alpha = progress.value * 0.3f
@@ -128,33 +139,31 @@ fun SensitiveButton(
 
         // Text
         Text(
-            text = text,
-            style = System.font.body.base.medium,
-            color = colors.textColor(enabled),
-            modifier = Modifier.padding(SensitiveButtonDefaults.ContentPadding),
+            text = state.text,
+            style = style.text,
+            color = colors.textColor(state.enabled),
+            modifier = Modifier.padding(dimens.contentPadding),
         )
     }
 }
 
 /**
- * Default values for [SensitiveButton].
+ * Default configuration values for [SensitiveButton].
+ *
+ * Provides theme-aware defaults for [colors], [style], and [dimens] that can be overridden.
  */
 object SensitiveButtonDefaults {
 
-    val MinHeight: Dp = 52.dp
-    val CornerRadius: Dp = 16.dp
-    val Shape: Shape = RoundedCornerShape(CornerRadius)
-    val ContentPadding: PaddingValues = PaddingValues(
-        horizontal = 24.dp,
-        vertical = 14.dp,
-    )
-    const val HoldDurationMs: Int = 3000
-
     /**
      * Color configuration for [SensitiveButton].
+     *
+     * @param container Background color when enabled.
+     * @param disabledContainer Background color when disabled.
+     * @param text Text color when enabled.
+     * @param disabledText Text color when disabled.
+     * @param progress Progress overlay color.
      */
-    @Immutable
-    data class Colors(
+    data class SensitiveButtonColors(
         val container: Color,
         val disabledContainer: Color,
         val text: Color,
@@ -175,12 +184,59 @@ object SensitiveButtonDefaults {
         text: Color = System.color.textRed,
         disabledText: Color = System.color.textSubtle,
         progress: Color = System.color.textRed,
-    ): Colors = Colors(
+    ) = SensitiveButtonColors(
         container = container,
         disabledContainer = disabledContainer,
         text = text,
         disabledText = disabledText,
         progress = progress,
+    )
+
+    /**
+     * Text style configuration for [SensitiveButton].
+     *
+     * @param text Button text style.
+     */
+    data class SensitiveButtonStyle(
+        val text: TextStyle,
+    )
+
+    @Composable
+    fun style(
+        text: TextStyle = System.font.body.base.medium,
+    ) = SensitiveButtonStyle(
+        text = text,
+    )
+
+    /**
+     * Dimension configuration for [SensitiveButton].
+     *
+     * @param minHeight Minimum button height.
+     * @param shape Button shape.
+     * @param contentPadding Padding inside the button.
+     * @param holdDurationMs Time to hold in milliseconds.
+     */
+    data class SensitiveButtonDimens(
+        val minHeight: Dp,
+        val shape: Shape,
+        val contentPadding: PaddingValues,
+        val holdDurationMs: Int,
+    )
+
+    @Composable
+    fun dimens(
+        minHeight: Dp = 52.dp,
+        shape: Shape = RoundedCornerShape(16.dp),
+        contentPadding: PaddingValues = PaddingValues(
+            horizontal = 24.dp,
+            vertical = 14.dp,
+        ),
+        holdDurationMs: Int = 3000,
+    ) = SensitiveButtonDimens(
+        minHeight = minHeight,
+        shape = shape,
+        contentPadding = contentPadding,
+        holdDurationMs = holdDurationMs,
     )
 }
 
@@ -193,7 +249,7 @@ private fun SensitiveButtonPreview() {
             .padding(16.dp)
     ) {
         SensitiveButton(
-            text = "Delete Account",
+            state = SensitiveButtonState(text = "Delete Account"),
             onConfirm = {},
         )
     }

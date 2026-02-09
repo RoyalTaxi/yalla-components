@@ -8,7 +8,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +19,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import uz.yalla.design.theme.System
 
 /**
+ * State for [NavigationButton] component.
+ *
+ * @property icon Icon to display.
+ * @property contentDescription Accessibility description.
+ */
+data class NavigationButtonState(
+    val icon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack,
+    val contentDescription: String? = "Navigate back"
+)
+
+/**
  * Navigation back button for screen headers.
  *
  * Use in top bars to navigate back to the previous screen.
@@ -27,66 +37,68 @@ import uz.yalla.design.theme.System
  * ## Usage
  *
  * ```kotlin
- * NavigationButton(onClick = onBack)
+ * NavigationButton(
+ *     state = NavigationButtonState(),
+ *     onClick = onBack
+ * )
  * ```
  *
  * ## With Custom Icon
  *
  * ```kotlin
  * NavigationButton(
+ *     state = NavigationButtonState(icon = Icons.Default.Close),
  *     onClick = onClose,
- *     icon = Icons.Default.Close,
  * )
  * ```
  *
- * @param onClick Invoked on click
- * @param modifier Applied to button
- * @param icon Icon to display. Defaults to back arrow.
- * @param contentDescription Accessibility description
- * @param colors Color configuration
+ * @param state Button state containing icon and contentDescription.
+ * @param onClick Invoked on click.
+ * @param modifier Applied to button.
+ * @param colors Color configuration, defaults to [NavigationButtonDefaults.colors].
+ * @param dimens Dimension configuration, defaults to [NavigationButtonDefaults.dimens].
  *
  * @see NavigationButtonDefaults for default values
  */
 @Composable
 fun NavigationButton(
+    state: NavigationButtonState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    icon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack,
-    contentDescription: String? = "Navigate back",
-    colors: NavigationButtonDefaults.Colors = NavigationButtonDefaults.colors(),
+    colors: NavigationButtonDefaults.NavigationButtonColors = NavigationButtonDefaults.colors(),
+    dimens: NavigationButtonDefaults.NavigationButtonDimens = NavigationButtonDefaults.dimens(),
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.size(NavigationButtonDefaults.Size),
-        shape = NavigationButtonDefaults.Shape,
+        modifier = modifier.size(dimens.size),
+        shape = dimens.shape,
         color = colors.container,
         contentColor = colors.content,
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                modifier = Modifier.size(NavigationButtonDefaults.IconSize),
+                imageVector = state.icon,
+                contentDescription = state.contentDescription,
+                modifier = Modifier.size(dimens.iconSize),
             )
         }
     }
 }
 
 /**
- * Default values for [NavigationButton].
+ * Default configuration values for [NavigationButton].
+ *
+ * Provides theme-aware defaults for [colors] and [dimens] that can be overridden.
  */
 object NavigationButtonDefaults {
 
-    val Size: Dp = 40.dp
-    val IconSize: Dp = 24.dp
-    val CornerRadius: Dp = 12.dp
-    val Shape: Shape = RoundedCornerShape(CornerRadius)
-
     /**
      * Color configuration for [NavigationButton].
+     *
+     * @param container Background color.
+     * @param content Icon color.
      */
-    @Immutable
-    data class Colors(
+    data class NavigationButtonColors(
         val container: Color,
         val content: Color,
     )
@@ -95,15 +107,46 @@ object NavigationButtonDefaults {
     fun colors(
         container: Color = System.color.backgroundTertiary,
         content: Color = System.color.iconBase,
-    ): Colors = Colors(
+    ) = NavigationButtonColors(
         container = container,
         content = content,
+    )
+
+    /**
+     * Dimension configuration for [NavigationButton].
+     *
+     * @param size Button size.
+     * @param iconSize Icon size.
+     * @param cornerRadius Corner radius.
+     * @param shape Button shape.
+     */
+    data class NavigationButtonDimens(
+        val size: Dp,
+        val iconSize: Dp,
+        val cornerRadius: Dp,
+        val shape: Shape,
+    )
+
+    @Composable
+    fun dimens(
+        size: Dp = 40.dp,
+        iconSize: Dp = 24.dp,
+        cornerRadius: Dp = 12.dp,
+        shape: Shape = RoundedCornerShape(cornerRadius),
+    ) = NavigationButtonDimens(
+        size = size,
+        iconSize = iconSize,
+        cornerRadius = cornerRadius,
+        shape = shape,
     )
 }
 
 @Preview
 @Composable
 private fun NavigationButtonPreview() {
-    NavigationButton(onClick = {})
+    NavigationButton(
+        state = NavigationButtonState(),
+        onClick = {}
+    )
 }
 

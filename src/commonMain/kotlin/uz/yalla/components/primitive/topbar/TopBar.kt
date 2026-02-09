@@ -12,14 +12,15 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import uz.yalla.components.primitive.button.NavigationButton
+import uz.yalla.components.primitive.button.NavigationButtonState
 import uz.yalla.design.theme.System
 
 /**
@@ -51,7 +52,9 @@ import uz.yalla.design.theme.System
  * @param modifier Applied to top bar.
  * @param title Optional title text.
  * @param onNavigationClick If provided, shows back button.
- * @param colors Color configuration.
+ * @param colors Color configuration, defaults to [TopBarDefaults.colors].
+ * @param style Text style configuration, defaults to [TopBarDefaults.style].
+ * @param dimens Dimension configuration, defaults to [TopBarDefaults.dimens].
  * @param actions Optional action buttons on the right.
  *
  * @see LargeTopBar for large title variant
@@ -62,22 +65,27 @@ fun TopBar(
     modifier: Modifier = Modifier,
     title: String? = null,
     onNavigationClick: (() -> Unit)? = null,
-    colors: TopBarDefaults.Colors = TopBarDefaults.colors(),
+    colors: TopBarDefaults.TopBarColors = TopBarDefaults.colors(),
+    style: TopBarDefaults.TopBarStyle = TopBarDefaults.style(),
+    dimens: TopBarDefaults.TopBarDimens = TopBarDefaults.dimens(),
     actions: @Composable (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(TopBarDefaults.ContentPadding),
+            .padding(dimens.contentPadding),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Navigation button
         if (onNavigationClick != null) {
-            NavigationButton(onClick = onNavigationClick)
+            NavigationButton(
+                state = NavigationButtonState(),
+                onClick = onNavigationClick
+            )
         } else {
-            Spacer(Modifier.width(TopBarDefaults.NavigationButtonSize))
+            Spacer(Modifier.width(dimens.navigationButtonSize))
         }
 
         // Title
@@ -88,7 +96,7 @@ fun TopBar(
             ) {
                 Text(
                     text = title,
-                    style = System.font.title.base,
+                    style = style.title,
                     color = colors.title,
                 )
             }
@@ -105,28 +113,25 @@ fun TopBar(
                 actions()
             }
         } else {
-            Spacer(Modifier.width(TopBarDefaults.NavigationButtonSize))
+            Spacer(Modifier.width(dimens.navigationButtonSize))
         }
     }
 }
 
 /**
- * Default values for [TopBar].
+ * Default configuration values for [TopBar].
+ *
+ * Provides theme-aware defaults for [colors], [style], and [dimens] that can be overridden.
  */
 object TopBarDefaults {
 
-    val ContentPadding: PaddingValues = PaddingValues(
-        horizontal = 16.dp,
-        vertical = 8.dp,
-    )
-    val NavigationButtonSize: Dp = 40.dp
-    val TitleSpacing: Dp = 16.dp
-
     /**
      * Color configuration for [TopBar].
+     *
+     * @param container Background color.
+     * @param title Title text color.
      */
-    @Immutable
-    data class Colors(
+    data class TopBarColors(
         val container: Color,
         val title: Color,
     )
@@ -135,9 +140,49 @@ object TopBarDefaults {
     fun colors(
         container: Color = Color.Transparent,
         title: Color = System.color.textBase,
-    ): Colors = Colors(
+    ) = TopBarColors(
         container = container,
         title = title,
+    )
+
+    /**
+     * Text style configuration for [TopBar].
+     *
+     * @param title Title text style.
+     */
+    data class TopBarStyle(
+        val title: TextStyle,
+    )
+
+    @Composable
+    fun style(
+        title: TextStyle = System.font.title.base,
+    ) = TopBarStyle(
+        title = title,
+    )
+
+    /**
+     * Dimension configuration for [TopBar].
+     *
+     * @param contentPadding Padding around content.
+     * @param navigationButtonSize Size of navigation button placeholder.
+     * @param titleSpacing Spacing around title.
+     */
+    data class TopBarDimens(
+        val contentPadding: PaddingValues,
+        val navigationButtonSize: Dp,
+        val titleSpacing: Dp,
+    )
+
+    @Composable
+    fun dimens(
+        contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        navigationButtonSize: Dp = 40.dp,
+        titleSpacing: Dp = 16.dp,
+    ) = TopBarDimens(
+        contentPadding = contentPadding,
+        navigationButtonSize = navigationButtonSize,
+        titleSpacing = titleSpacing,
     )
 }
 

@@ -34,6 +34,8 @@ connectivity = "2.4.0"
 
 # UI Components
 cupertino = "2.3.1"
+compottie = "2.0.2"
+constraintlayout = "0.6.1"
 
 [libraries]
 # Yalla
@@ -81,6 +83,16 @@ connectivity-device = { module = "dev.jordond.connectivity:connectivity-device",
 
 # Cupertino (iOS-style components)
 cupertino = { module = "io.github.schott12521:cupertino", version.ref = "cupertino" }
+
+# Lottie animations
+compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
+compottie-resources = { module = "io.github.alexzhirkevich:compottie-resources", version.ref = "compottie" }
+
+# Layout
+constraintlayout = { module = "tech.annexflow.compose:constraintlayout-compose-multiplatform", version.ref = "constraintlayout" }
+
+# Date/Time picker
+datetime-wheel-picker = { module = "io.github.darkokoa:datetime-wheel-picker", version = "1.0.0" }
 
 [plugins]
 android-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }

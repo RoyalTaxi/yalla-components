@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "uz.yalla"
-version = "1.1.1"
+version = "2.0.0"
 
 kotlin {
     targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java).configureEach {
@@ -81,11 +81,19 @@ kotlin {
 
             // iOS-style components
             implementation(libs.cupertino)
+
+            // Lottie animations
+            implementation(libs.compottie)
+            implementation(libs.compottie.resources)
+
+            // Layout
+            implementation(libs.constraintlayout)
         }
 
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
             implementation(libs.koin.android)
+            implementation(libs.datetime.wheel.picker)
         }
 
         iosMain.dependencies {
