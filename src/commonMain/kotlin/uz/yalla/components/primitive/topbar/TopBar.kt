@@ -156,7 +156,7 @@ object TopBarDefaults {
 
     @Composable
     fun style(
-        title: TextStyle = System.font.title.base,
+        title: TextStyle = System.font.body.base.medium,
     ) = TopBarStyle(
         title = title,
     )
@@ -176,7 +176,7 @@ object TopBarDefaults {
 
     @Composable
     fun dimens(
-        contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        contentPadding: PaddingValues = PaddingValues(16.dp),
         navigationButtonSize: Dp = 40.dp,
         titleSpacing: Dp = 16.dp,
     ) = TopBarDimens(

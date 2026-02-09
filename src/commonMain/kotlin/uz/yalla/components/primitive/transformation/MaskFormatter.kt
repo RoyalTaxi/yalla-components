@@ -27,7 +27,7 @@ object MaskFormatter {
     fun format(
         text: String,
         mask: String,
-        maskChar: Char = '#',
+        maskChar: Char = '_',
     ): String {
         if (text.isEmpty()) return ""
 
@@ -56,7 +56,7 @@ object MaskFormatter {
      * @param maskChar Placeholder character
      * @return Number of input positions available
      */
-    fun countPlaceholders(mask: String, maskChar: Char = '#'): Int =
+    fun countPlaceholders(mask: String, maskChar: Char = '_'): Int =
         mask.count { it == maskChar }
 
     /**
@@ -70,7 +70,7 @@ object MaskFormatter {
     fun extractRaw(
         formatted: String,
         mask: String,
-        maskChar: Char = '#',
+        maskChar: Char = '_',
     ): String {
         val result = StringBuilder()
 

@@ -1,8 +1,5 @@
 package uz.yalla.components.composite.sheet
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,31 +9,25 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import uz.yalla.components.primitive.button.PrimaryButton
 import uz.yalla.components.primitive.button.PrimaryButtonState
 import uz.yalla.design.theme.System
+import uz.yalla.platform.button.SheetIconButton
+import uz.yalla.platform.model.IconType
 
 /**
  * State for [ConfirmationSheet].
@@ -97,7 +88,6 @@ sealed interface ConfirmationSheetEffect {
  * @param state Sheet state including visibility and content.
  * @param onEffect Callback for sheet effects (dismiss, confirm).
  * @param modifier Applied to sheet.
- * @param closeButton Optional close button slot.
  * @param colors Color configuration, defaults to [ConfirmationSheetDefaults.colors].
  * @param dimens Dimension configuration, defaults to [ConfirmationSheetDefaults.dimens].
  *
@@ -111,36 +101,9 @@ fun ConfirmationSheet(
     state: ConfirmationSheetState,
     onEffect: (ConfirmationSheetEffect) -> Unit,
     modifier: Modifier = Modifier,
-    closeButton: (@Composable () -> Unit)? = null,
     colors: ConfirmationSheetDefaults.ConfirmationSheetColors = ConfirmationSheetDefaults.colors(),
     dimens: ConfirmationSheetDefaults.ConfirmationSheetDimens = ConfirmationSheetDefaults.dimens(),
 ) {
-    var contentVisible by remember { mutableStateOf(false) }
-
-    val contentAlpha by animateFloatAsState(
-        targetValue = if (contentVisible) 1f else 0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium,
-        ),
-        label = "contentAlpha",
-    )
-
-    val contentOffsetY by animateFloatAsState(
-        targetValue = if (contentVisible) 0f else 24f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium,
-        ),
-        label = "contentOffset",
-    )
-
-    LaunchedEffect(state.isVisible) {
-        if (!state.isVisible) {
-            contentVisible = false
-        }
-    }
-
     Sheet(
         isVisible = state.isVisible,
         onDismissRequest = { onEffect(ConfirmationSheetEffect.Dismiss) },
@@ -150,7 +113,6 @@ fun ConfirmationSheet(
             container = colors.container,
         ),
         dragHandle = null,
-        onFullyExpanded = { contentVisible = true },
     ) {
         Column(modifier = Modifier.background(colors.container)) {
             Spacer(Modifier.height(dimens.headerTopPadding))
@@ -169,19 +131,17 @@ fun ConfirmationSheet(
                     )
                 }
 
-                if (closeButton != null) {
-                    closeButton()
-                }
+                SheetIconButton(
+                    iconType = IconType.CLOSE,
+                    onClick = { onEffect(ConfirmationSheetEffect.Dismiss) },
+                )
             }
 
             Spacer(Modifier.height(dimens.contentTopPadding))
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(horizontal = dimens.contentHorizontalPadding)
-                    .alpha(contentAlpha)
-                    .offset { IntOffset(0, contentOffsetY.toInt()) },
+                modifier = Modifier.padding(horizontal = dimens.contentHorizontalPadding),
             ) {
                 Image(
                     painter = state.image,
@@ -218,8 +178,7 @@ fun ConfirmationSheet(
                 onClick = { onEffect(ConfirmationSheetEffect.Confirm) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = dimens.actionHorizontalPadding)
-                    .alpha(contentAlpha),
+                    .padding(horizontal = dimens.actionHorizontalPadding),
             )
 
             Spacer(Modifier.height(dimens.actionBottomSpacing))
@@ -316,4 +275,3 @@ object ConfirmationSheetDefaults {
         actionBottomSpacing = actionBottomSpacing,
     )
 }
-

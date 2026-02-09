@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.CircularProgressIndicator
+import uz.yalla.platform.indicator.NativeLoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -232,9 +232,8 @@ private fun IconSlot(
  */
 @Composable
 private fun LoadingIndicator(dimens: PrimaryButtonDefaults.PrimaryButtonDimens) {
-    CircularProgressIndicator(
+    NativeLoadingIndicator(
         modifier = Modifier.size(dimens.iconSize),
-        strokeWidth = 2.dp,
         color = LocalContentColor.current,
     )
 }
@@ -398,8 +397,8 @@ object PrimaryButtonDefaults {
         smallMinHeight: Dp = 40.dp,
         smallContentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
         mediumMinWidth: Dp = 120.dp,
-        mediumMinHeight: Dp = 52.dp,
-        mediumContentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
+        mediumMinHeight: Dp = 60.dp,
+        mediumContentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
         largeMinWidth: Dp = 160.dp,
         largeMinHeight: Dp = 60.dp,
         largeContentPadding: PaddingValues = PaddingValues(horizontal = 32.dp, vertical = 18.dp)

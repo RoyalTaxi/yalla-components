@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import uz.yalla.components.util.formatArgs
-import uz.yalla.components.util.formatMoney
 import uz.yalla.design.theme.System
 import uz.yalla.resources.Res
 import uz.yalla.resources.bonus_balance
@@ -241,7 +240,7 @@ fun EnableBonusCard(
                 )
 
                 Text(
-                    text = stringResource(Res.string.bonus_balance).formatArgs(state.balance.formatMoney()),
+                    text = stringResource(Res.string.bonus_balance).formatArgs(state.balance.toString()),
                     style = style.subtitle,
                     color = colors.subtitle
                 )

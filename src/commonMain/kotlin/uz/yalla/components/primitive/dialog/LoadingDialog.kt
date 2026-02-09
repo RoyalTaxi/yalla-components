@@ -3,9 +3,7 @@ package uz.yalla.components.primitive.dialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +15,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.tooling.preview.Preview
 import uz.yalla.design.theme.System
+import uz.yalla.platform.indicator.NativeLoadingIndicator
 
 /**
  * Modal loading dialog with centered spinner.
@@ -44,7 +43,7 @@ import uz.yalla.design.theme.System
 fun LoadingDialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
-    dismissOnBackPress: Boolean = false,
+    dismissOnBackPress: Boolean = true,
     dismissOnClickOutside: Boolean = false,
     colors: LoadingDialogDefaults.LoadingDialogColors = LoadingDialogDefaults.colors(),
     dimens: LoadingDialogDefaults.LoadingDialogDimens = LoadingDialogDefaults.dimens(),
@@ -58,18 +57,16 @@ fun LoadingDialog(
     ) {
         Box(
             modifier = modifier
-                .size(dimens.size)
                 .background(
                     color = colors.container,
                     shape = dimens.shape,
-                )
-                .padding(dimens.contentPadding),
+                ),
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(dimens.indicatorSize),
+            NativeLoadingIndicator(
+                modifier = Modifier.padding(dimens.contentPadding),
                 color = colors.indicator,
-                strokeWidth = dimens.strokeWidth,
+                backgroundColor = colors.container,
             )
         }
     }
@@ -95,8 +92,8 @@ object LoadingDialogDefaults {
 
     @Composable
     fun colors(
-        container: Color = System.color.backgroundBase,
-        indicator: Color = System.color.buttonActive,
+        container: Color = Color.White,
+        indicator: Color = System.color.backgroundBrandBase,
     ) = LoadingDialogColors(
         container = container,
         indicator = indicator,
@@ -105,57 +102,35 @@ object LoadingDialogDefaults {
     /**
      * Dimension configuration for [LoadingDialog].
      *
-     * @param size Dialog box size.
-     * @param indicatorSize Spinner size.
-     * @param strokeWidth Spinner stroke width.
-     * @param cornerRadius Corner radius.
      * @param contentPadding Padding inside dialog.
      * @param shape Dialog shape.
      */
     data class LoadingDialogDimens(
-        val size: Dp,
-        val indicatorSize: Dp,
-        val strokeWidth: Dp,
-        val cornerRadius: Dp,
         val contentPadding: Dp,
         val shape: Shape,
     )
 
     @Composable
     fun dimens(
-        size: Dp = 100.dp,
-        indicatorSize: Dp = 48.dp,
-        strokeWidth: Dp = 4.dp,
-        cornerRadius: Dp = 16.dp,
-        contentPadding: Dp = 24.dp,
-        shape: Shape = RoundedCornerShape(cornerRadius),
+        contentPadding: Dp = 20.dp,
+        shape: Shape = CircleShape,
     ) = LoadingDialogDimens(
-        size = size,
-        indicatorSize = indicatorSize,
-        strokeWidth = strokeWidth,
-        cornerRadius = cornerRadius,
         contentPadding = contentPadding,
         shape = shape,
     )
 }
-
 
 @Preview
 @Composable
 private fun LoadingDialogContentPreview() {
     Box(
         modifier = Modifier
-            .size(100.dp)
             .background(
                 color = Color.White,
-                shape = RoundedCornerShape(16.dp),
-            )
-            .padding(24.dp),
+                shape = CircleShape,
+            ),
         contentAlignment = Alignment.Center,
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(48.dp),
-            strokeWidth = 4.dp,
-        )
+        Box(Modifier.padding(20.dp))
     }
 }

@@ -22,7 +22,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import uz.yalla.components.util.formatMoney
 import uz.yalla.design.theme.System
 import uz.yalla.resources.Res
 import uz.yalla.resources.ic_coin
@@ -199,7 +198,7 @@ private fun BonusAmountItemContent(
         )
 
         Text(
-            text = bonus.formatMoney(),
+            text = bonus.toString(),
             style = style.amount,
             color = colors.text
         )

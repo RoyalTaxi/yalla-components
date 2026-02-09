@@ -141,7 +141,7 @@ object TextButtonDefaults {
     @Composable
     fun colors(
         content: Color = System.color.textLink,
-        disabledContent: Color = System.color.textSubtle,
+        disabledContent: Color = System.color.textBase,
     ) = TextButtonColors(
         content = content,
         disabledContent = disabledContent,
@@ -168,9 +168,9 @@ object TextButtonDefaults {
 
     @Composable
     fun style(
-        small: TextStyle = System.font.body.small.medium,
-        medium: TextStyle = System.font.body.base.medium,
-        large: TextStyle = System.font.body.large.medium,
+        small: TextStyle = System.font.body.small.regular,
+        medium: TextStyle = System.font.body.small.regular,
+        large: TextStyle = System.font.body.small.regular,
     ) = TextButtonStyle(
         small = small,
         medium = medium,

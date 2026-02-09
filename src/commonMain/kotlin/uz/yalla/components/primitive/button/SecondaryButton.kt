@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.CircularProgressIndicator
+import uz.yalla.platform.indicator.NativeLoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -101,9 +101,8 @@ fun SecondaryButton(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (state.loading) {
-                CircularProgressIndicator(
+                NativeLoadingIndicator(
                     modifier = Modifier.size(dimens.iconSize),
-                    strokeWidth = 2.dp,
                     color = LocalContentColor.current,
                 )
             } else {
@@ -177,10 +176,10 @@ object SecondaryButtonDefaults {
 
     @Composable
     fun colors(
-        container: Color = System.color.backgroundTertiary,
-        content: Color = System.color.textBase,
-        disabledContainer: Color = System.color.backgroundTertiary.copy(alpha = 0.5f),
-        disabledContent: Color = System.color.textSubtle
+        container: Color = System.color.buttonTertiary,
+        content: Color = System.color.backgroundBase,
+        disabledContainer: Color = System.color.buttonDisabled,
+        disabledContent: Color = System.color.textWhite
     ) = SecondaryButtonColors(
         container = container,
         content = content,
@@ -276,8 +275,8 @@ object SecondaryButtonDefaults {
         smallMinHeight: Dp = 40.dp,
         smallContentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
         mediumMinWidth: Dp = 120.dp,
-        mediumMinHeight: Dp = 52.dp,
-        mediumContentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
+        mediumMinHeight: Dp = 60.dp,
+        mediumContentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
         largeMinWidth: Dp = 160.dp,
         largeMinHeight: Dp = 60.dp,
         largeContentPadding: PaddingValues = PaddingValues(horizontal = 32.dp, vertical = 18.dp)

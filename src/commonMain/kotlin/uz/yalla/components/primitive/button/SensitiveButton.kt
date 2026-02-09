@@ -3,149 +3,53 @@ package uz.yalla.components.primitive.button
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
-import kotlinx.coroutines.launch
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import uz.yalla.components.util.formatArgs
 import uz.yalla.design.theme.System
+import uz.yalla.resources.Res
+import uz.yalla.resources.img_sensitive_background
+import uz.yalla.resources.order_cancel_action_yes
+import uz.yalla.resources.order_cancel_countdown
 
 /**
  * State for [SensitiveButton] component.
  *
- * @property text Button label.
- * @property enabled When false, button is disabled.
+ * @property countdownText Text shown during countdown (with %s placeholder for seconds).
+ * @property confirmText Text shown when countdown completes.
  */
 data class SensitiveButtonState(
-    val text: String,
-    val enabled: Boolean = true
+    val countdownText: String,
+    val confirmText: String,
 )
-
-/**
- * Countdown confirmation button for destructive or sensitive actions.
- *
- * Requires user to hold the button for a duration before action executes.
- * Shows animated progress during hold. Cancels if released early.
- *
- * Use for actions like "Delete Account", "Cancel Order", or "Logout".
- *
- * ## Usage
- *
- * ```kotlin
- * SensitiveButton(
- *     state = SensitiveButtonState(text = "Delete Account"),
- *     onConfirm = viewModel::deleteAccount,
- * )
- * ```
- *
- * @param state Button state containing text and enabled.
- * @param onConfirm Invoked when hold duration completes.
- * @param modifier Applied to button.
- * @param colors Color configuration, defaults to [SensitiveButtonDefaults.colors].
- * @param style Text style configuration, defaults to [SensitiveButtonDefaults.style].
- * @param dimens Dimension configuration, defaults to [SensitiveButtonDefaults.dimens].
- *
- * @see SensitiveButtonDefaults for default values
- */
-@Composable
-fun SensitiveButton(
-    state: SensitiveButtonState,
-    onConfirm: () -> Unit,
-    modifier: Modifier = Modifier,
-    colors: SensitiveButtonDefaults.SensitiveButtonColors = SensitiveButtonDefaults.colors(),
-    style: SensitiveButtonDefaults.SensitiveButtonStyle = SensitiveButtonDefaults.style(),
-    dimens: SensitiveButtonDefaults.SensitiveButtonDimens = SensitiveButtonDefaults.dimens(),
-) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val scope = rememberCoroutineScope()
-
-    val progress = remember { Animatable(0f) }
-    var isPressed by remember { mutableStateOf(false) }
-
-    // Reset progress when lifecycle pauses
-    LaunchedEffect(lifecycleOwner) {
-        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED).not()) {
-            progress.snapTo(0f)
-        }
-    }
-
-    Box(
-        modifier = modifier
-            .defaultMinSize(minHeight = dimens.minHeight)
-            .fillMaxWidth()
-            .clip(dimens.shape)
-            .background(colors.containerColor(state.enabled))
-            .pointerInput(state.enabled) {
-                if (!state.enabled) return@pointerInput
-
-                detectTapGestures(
-                    onPress = {
-                        isPressed = true
-                        scope.launch {
-                            progress.animateTo(
-                                targetValue = 1f,
-                                animationSpec = tween(
-                                    durationMillis = dimens.holdDurationMs,
-                                    easing = LinearEasing,
-                                ),
-                            )
-                            if (progress.value >= 1f) {
-                                onConfirm()
-                            }
-                        }
-                        tryAwaitRelease()
-                        isPressed = false
-                        progress.snapTo(0f)
-                    },
-                )
-            },
-        contentAlignment = Alignment.Center,
-    ) {
-        // Progress overlay
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .clip(dimens.shape)
-                .background(
-                    color = colors.progress.copy(
-                        alpha = progress.value * 0.3f
-                    )
-                ),
-        )
-
-        // Text
-        Text(
-            text = state.text,
-            style = style.text,
-            color = colors.textColor(state.enabled),
-            modifier = Modifier.padding(dimens.contentPadding),
-        )
-    }
-}
 
 /**
  * Default configuration values for [SensitiveButton].
@@ -157,39 +61,21 @@ object SensitiveButtonDefaults {
     /**
      * Color configuration for [SensitiveButton].
      *
-     * @param container Background color when enabled.
-     * @param disabledContainer Background color when disabled.
-     * @param text Text color when enabled.
-     * @param disabledText Text color when disabled.
-     * @param progress Progress overlay color.
+     * @param progress Progress fill color.
+     * @param text Text color.
      */
     data class SensitiveButtonColors(
-        val container: Color,
-        val disabledContainer: Color,
-        val text: Color,
-        val disabledText: Color,
         val progress: Color,
-    ) {
-        fun containerColor(enabled: Boolean): Color =
-            if (enabled) container else disabledContainer
-
-        fun textColor(enabled: Boolean): Color =
-            if (enabled) text else disabledText
-    }
+        val text: Color,
+    )
 
     @Composable
     fun colors(
-        container: Color = System.color.textRed.copy(alpha = 0.1f),
-        disabledContainer: Color = System.color.backgroundTertiary,
-        text: Color = System.color.textRed,
-        disabledText: Color = System.color.textSubtle,
-        progress: Color = System.color.textRed,
+        progress: Color = System.color.buttonActive,
+        text: Color = System.color.textWhite,
     ) = SensitiveButtonColors(
-        container = container,
-        disabledContainer = disabledContainer,
-        text = text,
-        disabledText = disabledText,
         progress = progress,
+        text = text,
     )
 
     /**
@@ -203,7 +89,7 @@ object SensitiveButtonDefaults {
 
     @Composable
     fun style(
-        text: TextStyle = System.font.body.base.medium,
+        text: TextStyle = System.font.body.large.bold,
     ) = SensitiveButtonStyle(
         text = text,
     )
@@ -211,32 +97,134 @@ object SensitiveButtonDefaults {
     /**
      * Dimension configuration for [SensitiveButton].
      *
-     * @param minHeight Minimum button height.
+     * @param height Button height.
      * @param shape Button shape.
-     * @param contentPadding Padding inside the button.
-     * @param holdDurationMs Time to hold in milliseconds.
+     * @param countdownSeconds Countdown duration in seconds.
      */
     data class SensitiveButtonDimens(
-        val minHeight: Dp,
+        val height: Dp,
         val shape: Shape,
-        val contentPadding: PaddingValues,
-        val holdDurationMs: Int,
+        val countdownSeconds: Int,
     )
 
     @Composable
     fun dimens(
-        minHeight: Dp = 52.dp,
+        height: Dp = 60.dp,
         shape: Shape = RoundedCornerShape(16.dp),
-        contentPadding: PaddingValues = PaddingValues(
-            horizontal = 24.dp,
-            vertical = 14.dp,
-        ),
-        holdDurationMs: Int = 3000,
+        countdownSeconds: Int = 3,
     ) = SensitiveButtonDimens(
-        minHeight = minHeight,
+        height = height,
         shape = shape,
-        contentPadding = contentPadding,
-        holdDurationMs = holdDurationMs,
+        countdownSeconds = countdownSeconds,
+    )
+}
+
+/**
+ * Countdown confirmation button for destructive or sensitive actions.
+ *
+ * Displays a countdown timer that must complete before the button becomes active.
+ * The progress bar fills from left to right during countdown.
+ *
+ * Use for actions like "Delete Account", "Cancel Order", or "Logout".
+ *
+ * ## Usage
+ *
+ * ```kotlin
+ * SensitiveButton(
+ *     state = SensitiveButtonState(
+ *         countdownText = "Hold to cancel (%s)",
+ *         confirmText = "Yes, cancel",
+ *     ),
+ *     onClick = viewModel::cancelOrder,
+ * )
+ * ```
+ *
+ * @param state Button state containing countdown and confirm text.
+ * @param onClick Invoked when countdown completes and button is clicked.
+ * @param modifier Applied to button.
+ * @param colors Color configuration, defaults to [SensitiveButtonDefaults.colors].
+ * @param style Text style configuration, defaults to [SensitiveButtonDefaults.style].
+ * @param dimens Dimension configuration, defaults to [SensitiveButtonDefaults.dimens].
+ *
+ * @see SensitiveButtonDefaults for default values
+ */
+@Composable
+fun SensitiveButton(
+    state: SensitiveButtonState,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    colors: SensitiveButtonDefaults.SensitiveButtonColors = SensitiveButtonDefaults.colors(),
+    style: SensitiveButtonDefaults.SensitiveButtonStyle = SensitiveButtonDefaults.style(),
+    dimens: SensitiveButtonDefaults.SensitiveButtonDimens = SensitiveButtonDefaults.dimens(),
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val progress = remember { Animatable(0f) }
+    val countdown by remember { derivedStateOf { (dimens.countdownSeconds * (1f - progress.value)).toInt() } }
+    val isEnabled by remember { derivedStateOf { progress.value >= 1f } }
+
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            progress.snapTo(0f)
+            progress.animateTo(1f, tween(dimens.countdownSeconds * 1000, easing = LinearEasing))
+        }
+    }
+
+    Surface(
+        onClick = onClick,
+        enabled = isEnabled,
+        shape = dimens.shape,
+        color = Color.Transparent,
+        modifier = modifier.height(dimens.height),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Image(
+                painter = painterResource(Res.drawable.img_sensitive_background),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+
+            Box(
+                Modifier
+                    .fillMaxWidth(progress.value)
+                    .height(dimens.height)
+                    .align(Alignment.CenterStart)
+                    .background(colors.progress, dimens.shape),
+            )
+
+            Text(
+                text = when {
+                    isEnabled -> state.confirmText
+                    else -> state.countdownText.formatArgs(countdown)
+                },
+                color = colors.text,
+                style = style.text,
+            )
+        }
+    }
+}
+
+/**
+ * Convenience overload using string resources.
+ */
+@Composable
+fun SensitiveButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    colors: SensitiveButtonDefaults.SensitiveButtonColors = SensitiveButtonDefaults.colors(),
+    style: SensitiveButtonDefaults.SensitiveButtonStyle = SensitiveButtonDefaults.style(),
+    dimens: SensitiveButtonDefaults.SensitiveButtonDimens = SensitiveButtonDefaults.dimens(),
+) {
+    SensitiveButton(
+        state = SensitiveButtonState(
+            countdownText = stringResource(Res.string.order_cancel_countdown),
+            confirmText = stringResource(Res.string.order_cancel_action_yes),
+        ),
+        onClick = onClick,
+        modifier = modifier,
+        colors = colors,
+        style = style,
+        dimens = dimens,
     )
 }
 
@@ -249,8 +237,11 @@ private fun SensitiveButtonPreview() {
             .padding(16.dp)
     ) {
         SensitiveButton(
-            state = SensitiveButtonState(text = "Delete Account"),
-            onConfirm = {},
+            state = SensitiveButtonState(
+                countdownText = "Hold to cancel (%s)",
+                confirmText = "Yes, cancel",
+            ),
+            onClick = {},
         )
     }
 }

@@ -76,14 +76,16 @@ object NavigableCardDefaults {
      * @param borderWidth Border stroke width.
      * @param arrowSize Arrow icon size.
      * @param iconSpacing Spacing between icon and content.
-     * @param contentPadding Inner content padding.
+     * @param horizontalPadding Horizontal content padding.
+     * @param verticalPadding Vertical content padding.
      */
     data class NavigableCardDimens(
         val radius: Dp,
         val borderWidth: Dp,
         val arrowSize: Dp,
         val iconSpacing: Dp,
-        val contentPadding: Dp,
+        val horizontalPadding: Dp,
+        val verticalPadding: Dp,
     )
 
     @Composable
@@ -92,13 +94,15 @@ object NavigableCardDefaults {
         borderWidth: Dp = 1.dp,
         arrowSize: Dp = 24.dp,
         iconSpacing: Dp = 8.dp,
-        contentPadding: Dp = 16.dp,
+        horizontalPadding: Dp = 16.dp,
+        verticalPadding: Dp = 18.dp,
     ) = NavigableCardDimens(
         radius = radius,
         borderWidth = borderWidth,
         arrowSize = arrowSize,
         iconSpacing = iconSpacing,
-        contentPadding = contentPadding,
+        horizontalPadding = horizontalPadding,
+        verticalPadding = verticalPadding,
     )
 }
 
@@ -142,7 +146,10 @@ fun NavigableCard(
         ),
     ) {
         Row(
-            modifier = Modifier.padding(dimens.contentPadding),
+            modifier = Modifier.padding(
+                horizontal = dimens.horizontalPadding,
+                vertical = dimens.verticalPadding,
+            ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {

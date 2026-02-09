@@ -142,7 +142,7 @@ object LargeTopBarDefaults {
 
     @Composable
     fun style(
-        title: TextStyle = System.font.title.large,
+        title: TextStyle = System.font.title.xLarge,
     ) = LargeTopBarStyle(
         title = title,
     )
@@ -162,7 +162,7 @@ object LargeTopBarDefaults {
 
     @Composable
     fun dimens(
-        contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        contentPadding: PaddingValues = PaddingValues(16.dp),
         navigationButtonSize: Dp = 40.dp,
         titleTopSpacing: Dp = 20.dp,
     ) = LargeTopBarDimens(

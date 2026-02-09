@@ -105,7 +105,7 @@ object DotsIndicatorDefaults {
 
     @Composable
     fun colors(
-        selected: Color = System.color.buttonActive,
+        selected: Color = System.color.backgroundBrandBase,
         unselected: Color = System.color.backgroundTertiary,
     ) = DotsIndicatorColors(
         selected = selected,
@@ -129,9 +129,9 @@ object DotsIndicatorDefaults {
 
     @Composable
     fun dimens(
-        dotSize: Dp = 8.dp,
+        dotSize: Dp = 10.dp,
         selectedWidth: Dp = 24.dp,
-        dotSpacing: Dp = 8.dp,
+        dotSpacing: Dp = 4.dp,
         animationDurationMillis: Int = 200,
     ) = DotsIndicatorDimens(
         dotSize = dotSize,

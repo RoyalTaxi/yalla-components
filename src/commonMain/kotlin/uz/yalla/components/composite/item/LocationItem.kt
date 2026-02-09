@@ -5,11 +5,15 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Card
@@ -39,6 +43,71 @@ data class LocationItemState(
     val locations: List<String>,
     val placeholder: String
 )
+
+/**
+ * Simple location item with single text and optional icons.
+ *
+ * Use for simple location input fields that show a single text value.
+ *
+ * ## Usage
+ *
+ * ```kotlin
+ * LocationItem(
+ *     text = "Enter destination",
+ *     onClick = { openSearch() },
+ *     leadingContent = { Icon(Icons.Default.Search, null) },
+ * )
+ * ```
+ *
+ * @param text Display text.
+ * @param onClick Called when item is clicked.
+ * @param modifier Applied to item.
+ * @param leadingContent Optional leading slot.
+ * @param trailingContent Optional trailing slot.
+ * @param colors Color configuration.
+ * @param style Text style configuration.
+ * @param dimens Dimension configuration.
+ */
+@Composable
+fun LocationItem(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    leadingContent: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
+    colors: LocationItemDefaults.LocationItemColors = LocationItemDefaults.colors(),
+    style: LocationItemDefaults.LocationItemStyle = LocationItemDefaults.style(),
+    dimens: LocationItemDefaults.LocationItemDimens = LocationItemDefaults.dimens(),
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.heightIn(min = dimens.minHeight),
+        shape = dimens.shape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colors.container,
+        ),
+        contentPadding = PaddingValues(
+            start = dimens.horizontalPadding,
+            end = 8.dp,
+        ),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(dimens.contentSpacing),
+        ) {
+            leadingContent?.invoke()
+
+            Text(
+                text = text,
+                color = colors.location,
+                style = style.location,
+                modifier = Modifier.weight(1f),
+            )
+
+            trailingContent?.invoke()
+        }
+    }
+}
 
 /**
  * Location selector item showing multiple locations in flow layout.
@@ -245,7 +314,7 @@ object LocationItemDefaults {
 
     @Composable
     fun dimens(
-        shape: Shape = RectangleShape,
+        shape: Shape = RoundedCornerShape(16.dp),
         minHeight: Dp = 60.dp,
         contentSpacing: Dp = 12.dp,
         flowRowSpacing: Dp = 6.dp,

@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2026-02-09
+
+### Fixed
+
+- **TextButton** - Restored original default values:
+  - `disabledContent` color changed from `textSubtle` to `textBase`
+  - Text style changed to `body.small.regular` for all sizes (was incorrectly using `medium` variants)
+
+- **LocationItem** - Restored original shape: `RoundedCornerShape(16.dp)` (was incorrectly `RectangleShape`)
+
+- **MaskFormatter** - Restored original default mask character: `'_'` (was incorrectly `'#'`)
+
+- **LoadingDialog** - Restored original appearance:
+  - Shape changed from `RoundedCornerShape(16.dp)` to `CircleShape`
+  - Padding changed from `24.dp` to `20.dp`
+  - Container color changed to `Color.White`
+  - Indicator color changed to `backgroundBrandBase`
+  - `dismissOnBackPress` default changed to `true`
+  - Now uses `NativeLoadingIndicator` instead of `CircularProgressIndicator`
+
+- **DotsIndicator** - Restored original default values:
+  - `selected` color changed from `buttonActive` to `backgroundBrandBase`
+  - `dotSize` changed from `8.dp` to `10.dp`
+  - `dotSpacing` changed from `8.dp` to `4.dp`
+
 ## [2.0.1] - 2026-02-09
 
 ### Changed
