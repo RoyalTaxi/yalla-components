@@ -28,6 +28,49 @@ data class SnackbarData(
 )
 
 /**
+ * UI state for [AppSnackbarHost].
+ *
+ * @param data Current snackbar data to display.
+ * @param successIcon Icon shown for success variant.
+ * @param errorIcon Icon shown for error variant.
+ * @param dismissIcon Icon for dismiss button.
+ */
+data class AppSnackbarHostState(
+    val data: SnackbarData?,
+    val successIcon: Painter,
+    val errorIcon: Painter,
+    val dismissIcon: Painter,
+)
+
+/**
+ * Default configuration for [AppSnackbarHost].
+ *
+ * Provides theme-aware defaults for [dimens] that can be overridden.
+ */
+object AppSnackbarHostDefaults {
+
+    /**
+     * Dimension configuration for [AppSnackbarHost].
+     *
+     * @param topPadding Top padding below status bar.
+     * @param horizontalPadding Horizontal padding.
+     */
+    data class AppSnackbarHostDimens(
+        val topPadding: Dp,
+        val horizontalPadding: Dp,
+    )
+
+    @Composable
+    fun dimens(
+        topPadding: Dp = 8.dp,
+        horizontalPadding: Dp = 24.dp,
+    ) = AppSnackbarHostDimens(
+        topPadding = topPadding,
+        horizontalPadding = horizontalPadding,
+    )
+}
+
+/**
  * Snackbar host for displaying transient messages.
  *
  * Shows snackbars at the top of the screen with status bar padding.
@@ -38,11 +81,13 @@ data class SnackbarData(
  * val snackbarHostState = remember { SnackbarHostState() }
  *
  * AppSnackbarHost(
- *     data = currentSnackbar,
+ *     state = AppSnackbarHostState(
+ *         data = currentSnackbar,
+ *         successIcon = painterResource(Res.drawable.ic_check_circle),
+ *         errorIcon = painterResource(Res.drawable.ic_warning),
+ *         dismissIcon = painterResource(Res.drawable.ic_x),
+ *     ),
  *     hostState = snackbarHostState,
- *     successIcon = painterResource(Res.drawable.ic_check_circle),
- *     errorIcon = painterResource(Res.drawable.ic_warning),
- *     dismissIcon = painterResource(Res.drawable.ic_x),
  *     onDismiss = { snackbarHostState.currentSnackbarData?.dismiss() },
  * )
  *
@@ -52,27 +97,22 @@ data class SnackbarData(
  * }
  * ```
  *
- * @param data Current snackbar data.
+ * @param state Current UI state with data and icons.
  * @param hostState Material snackbar host state.
- * @param successIcon Icon for success variant.
- * @param errorIcon Icon for error variant.
- * @param dismissIcon Dismiss button icon.
  * @param onDismiss Called when dismiss clicked.
  * @param modifier Applied to host.
- * @param dimens Dimension configuration, defaults to [SnackbarHostDefaults.dimens].
+ * @param dimens Dimension configuration, defaults to [AppSnackbarHostDefaults.dimens].
  *
- * @see SnackbarHostDefaults for default values
+ * @see AppSnackbarHostState for state configuration
+ * @see AppSnackbarHostDefaults for default values
  */
 @Composable
 fun AppSnackbarHost(
-    data: SnackbarData?,
+    state: AppSnackbarHostState,
     hostState: SnackbarHostState,
-    successIcon: Painter,
-    errorIcon: Painter,
-    dismissIcon: Painter,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    dimens: SnackbarHostDefaults.SnackbarHostDimens = SnackbarHostDefaults.dimens(),
+    dimens: AppSnackbarHostDefaults.AppSnackbarHostDimens = AppSnackbarHostDefaults.dimens(),
 ) {
     SnackbarHost(
         hostState = hostState,
@@ -81,46 +121,18 @@ fun AppSnackbarHost(
             .padding(top = dimens.topPadding)
             .padding(horizontal = dimens.horizontalPadding),
     ) {
-        if (data != null) {
+        if (state.data != null) {
             Snackbar(
                 state = SnackbarState(
-                    message = data.message,
-                    variant = if (data.isSuccess) SnackbarVariant.Success else SnackbarVariant.Error,
-                    icon = if (data.isSuccess) successIcon else errorIcon,
-                    dismissIcon = dismissIcon,
+                    message = state.data.message,
+                    variant = if (state.data.isSuccess) SnackbarVariant.Success else SnackbarVariant.Error,
+                    icon = if (state.data.isSuccess) state.successIcon else state.errorIcon,
+                    dismissIcon = state.dismissIcon,
                 ),
                 onDismiss = onDismiss,
             )
         }
     }
-}
-
-/**
- * Default values for [AppSnackbarHost].
- *
- * Provides defaults for [dimens] that can be overridden.
- */
-object SnackbarHostDefaults {
-
-    /**
-     * Dimension configuration for [AppSnackbarHost].
-     *
-     * @param topPadding Top padding.
-     * @param horizontalPadding Horizontal padding.
-     */
-    data class SnackbarHostDimens(
-        val topPadding: Dp,
-        val horizontalPadding: Dp,
-    )
-
-    @Composable
-    fun dimens(
-        topPadding: Dp = 8.dp,
-        horizontalPadding: Dp = 24.dp,
-    ): SnackbarHostDimens = SnackbarHostDimens(
-        topPadding = topPadding,
-        horizontalPadding = horizontalPadding,
-    )
 }
 
 @Preview

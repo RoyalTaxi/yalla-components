@@ -15,7 +15,7 @@ A Kotlin Multiplatform component library for Yalla apps, built with Compose Mult
 Add the dependency to your `build.gradle.kts`:
 
 ```kotlin
-implementation("uz.yalla:components:2.0.0")
+implementation("uz.yalla:components:2.0.1")
 ```
 
 Configure GitHub Packages repository:
@@ -209,7 +209,7 @@ Higher-level components composed of primitives.
 | Component | Description | State Class |
 |-----------|-------------|-------------|
 | `Snackbar` | Toast notification message | `SnackbarState` |
-| `AppSnackbarHost` | Snackbar host container | - |
+| `AppSnackbarHost` | Snackbar host container | `AppSnackbarHostState` |
 
 ### Foundation
 

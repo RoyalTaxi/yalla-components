@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "uz.yalla"
-version = "2.0.0"
+version = "2.0.1"
 
 kotlin {
     targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java).configureEach {
