@@ -2,6 +2,7 @@ package uz.yalla.components.foundation.location
 
 import dev.icerock.moko.geo.LocationTracker
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,7 +39,7 @@ import uz.yalla.core.geo.GeoPoint
 class LocationManager(
     val locationTracker: LocationTracker,
 ) {
-    private val scope = CoroutineScope(SupervisorJob())
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val _currentLocation = MutableStateFlow<ExtendedLocation?>(null)
 
