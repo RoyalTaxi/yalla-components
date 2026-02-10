@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
-import uz.yalla.components.model.type.LocaleType
+import uz.yalla.core.kind.LocaleKind
 import uz.yalla.design.theme.System
 import uz.yalla.resources.Res
 import uz.yalla.resources.ic_flag_rectangle
@@ -225,7 +225,7 @@ fun CarNumber(
                 )
 
                 Text(
-                    text = LocaleType.UZ.name,
+                    text = LocaleKind.Uz.name,
                     color = colors.countryCode,
                     style = style.number.copy(
                         fontSize = 8.sp.scaled(),

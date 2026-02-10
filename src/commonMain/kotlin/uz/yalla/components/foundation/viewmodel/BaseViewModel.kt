@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlin.time.Duration
 import org.jetbrains.compose.resources.StringResource
-import uz.yalla.components.foundation.error.DataError
+import uz.yalla.core.error.DataError
 import uz.yalla.resources.Res
 import uz.yalla.resources.error_client_request
 import uz.yalla.resources.error_connection_timeout
@@ -142,14 +142,13 @@ abstract class BaseViewModel : ViewModel() {
      */
     protected open fun mapThrowableToUserMessage(throwable: Throwable): StringResource =
         when (throwable) {
-            DataError.Network.NO_INTERNET_ERROR -> Res.string.error_no_internet
-            DataError.Network.SOCKET_TIME_OUT_ERROR -> Res.string.error_connection_timeout
-            DataError.Network.UNAUTHORIZED_ERROR -> Res.string.error_session_expired
-            DataError.Network.CLIENT_REQUEST_ERROR -> Res.string.error_client_request
-            DataError.Network.SERVER_RESPONSE_ERROR -> Res.string.error_server_busy
-            DataError.Network.REDIRECT_RESPONSE_ERROR -> Res.string.error_unexpected_redirect
-            DataError.Network.SERIALIZATION_ERROR -> Res.string.error_data_format
-            DataError.Network.UNKNOWN_ERROR -> Res.string.error_network_unexpected
+            DataError.Network.NoInternet -> Res.string.error_no_internet
+            DataError.Network.Timeout -> Res.string.error_connection_timeout
+            DataError.Network.Unauthorized -> Res.string.error_session_expired
+            DataError.Network.ClientError -> Res.string.error_client_request
+            DataError.Network.ServerError -> Res.string.error_server_busy
+            DataError.Network.SerializationError -> Res.string.error_data_format
+            is DataError.Network.Unknown -> Res.string.error_network_unexpected
             else -> Res.string.error_unexpected
         }
 }

@@ -1,5 +1,6 @@
 [versions]
 # Yalla libraries
+yalla-core = "1.0.0"
 yalla-design = "1.1.0"
 yalla-resources = "1.5.0"
 yalla-platform = "2.1.2"
@@ -39,6 +40,7 @@ constraintlayout = "0.6.1"
 
 [libraries]
 # Yalla
+yalla-core = { module = "uz.yalla:core", version.ref = "yalla-core" }
 yalla-design = { module = "uz.yalla:design", version.ref = "yalla-design" }
 yalla-resources = { module = "uz.yalla:resources", version.ref = "yalla-resources" }
 yalla-platform = { module = "uz.yalla:platform", version.ref = "yalla-platform" }

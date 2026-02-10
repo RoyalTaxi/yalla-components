@@ -7,7 +7,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import uz.yalla.components.model.common.SelectableItemModel
-import uz.yalla.components.model.type.LocaleType
+import uz.yalla.core.kind.LocaleKind
 import uz.yalla.resources.Res
 import uz.yalla.resources.ic_flag_en
 import uz.yalla.resources.ic_flag_ru
@@ -20,30 +20,30 @@ import uz.yalla.resources.language_uzbek_latin
 sealed class LanguageModel(
     val icon: DrawableResource,
     val name: StringResource,
-    val localeType: LocaleType
+    val localeKind: LocaleKind
 ) {
     data object Uzbek : LanguageModel(
         icon = Res.drawable.ic_flag_uz,
         name = Res.string.language_uzbek_latin,
-        localeType = LocaleType.UZ
+        localeKind = LocaleKind.Uz
     )
 
     data object UzbekCyrillic : LanguageModel(
         icon = Res.drawable.ic_flag_uz,
         name = Res.string.language_uzbek_cyrillic,
-        localeType = LocaleType.UZ_CYRILLIC
+        localeKind = LocaleKind.UzCyrillic
     )
 
     data object Russian : LanguageModel(
         icon = Res.drawable.ic_flag_ru,
         name = Res.string.language_russian,
-        localeType = LocaleType.RU
+        localeKind = LocaleKind.Ru
     )
 
     data object English : LanguageModel(
         icon = Res.drawable.ic_flag_en,
         name = Res.string.language_english,
-        localeType = LocaleType.EN
+        localeKind = LocaleKind.En
     )
 
     @Composable
@@ -58,12 +58,12 @@ sealed class LanguageModel(
     companion object {
         val LANGUAGES = listOf(Uzbek, Russian)
 
-        fun fromLocaleType(localeType: LocaleType): LanguageModel =
-            when (localeType) {
-                LocaleType.UZ -> Uzbek
-                LocaleType.UZ_CYRILLIC -> UzbekCyrillic
-                LocaleType.RU -> Russian
-                LocaleType.EN -> English
+        fun fromLocaleKind(localeKind: LocaleKind): LanguageModel =
+            when (localeKind) {
+                LocaleKind.Uz -> Uzbek
+                LocaleKind.UzCyrillic -> UzbekCyrillic
+                LocaleKind.Ru -> Russian
+                LocaleKind.En -> English
             }
     }
 }

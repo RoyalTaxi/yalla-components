@@ -1,23 +1,6 @@
 package uz.yalla.components.foundation.location
 
-/**
- * Represents a geographic location with latitude and longitude coordinates.
- *
- * @property latitude Latitude in degrees (-90 to 90)
- * @property longitude Longitude in degrees (-180 to 180)
- */
-data class MapPoint(
-    val latitude: Double,
-    val longitude: Double,
-) {
-    companion object {
-        /** Default location (Tashkent, Uzbekistan). */
-        val DEFAULT = MapPoint(latitude = 41.2995, longitude = 69.2401)
-
-        /** Creates MapPoint from coordinate pair. */
-        fun from(lat: Double, lng: Double) = MapPoint(lat, lng)
-    }
-}
+import uz.yalla.core.geo.GeoPoint
 
 /**
  * Extended location data with additional metadata.
@@ -39,8 +22,8 @@ data class ExtendedLocation(
     val bearing: Float? = null,
     val timestamp: Long = 0L,
 ) {
-    /** Converts to simple [MapPoint]. */
-    fun toMapPoint(): MapPoint = MapPoint(latitude, longitude)
+    /** Converts to [GeoPoint]. */
+    fun toGeoPoint(): GeoPoint = GeoPoint(latitude, longitude)
 }
 
 /**

@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "uz.yalla"
-version = "2.0.2"
+version = "2.2.0"
 
 kotlin {
     targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java).configureEach {
@@ -38,6 +38,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // Yalla libraries
+            api(libs.yalla.core)
             implementation(libs.yalla.design)
             implementation(libs.yalla.resources)
             implementation(libs.yalla.platform)
