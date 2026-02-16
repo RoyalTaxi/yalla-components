@@ -107,6 +107,8 @@ fun PrimaryButton(
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     val isInteractive = state.enabled && !state.loading
+    val containerColor = colors.containerColor(isInteractive)
+    val contentColor = colors.contentColor(isInteractive)
 
     ButtonContainer(
         onClick = onClick,
@@ -116,8 +118,8 @@ fun PrimaryButton(
         ),
         enabled = isInteractive,
         shape = dimens.shape,
-        containerColor = colors.containerColor(isInteractive),
-        contentColor = colors.contentColor(isInteractive),
+        containerColor = containerColor,
+        contentColor = contentColor,
         contentPadding = dimens.contentPadding(state.size),
     ) {
         ButtonContent(
@@ -127,6 +129,7 @@ fun PrimaryButton(
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
             dimens = dimens,
+            indicatorBackgroundColor = containerColor,
         )
     }
 }
@@ -173,9 +176,13 @@ private fun RowScope.ButtonContent(
     leadingIcon: @Composable (() -> Unit)?,
     trailingIcon: @Composable (() -> Unit)?,
     dimens: PrimaryButtonDefaults.PrimaryButtonDimens,
+    indicatorBackgroundColor: Color,
 ) {
     if (loading) {
-        LoadingIndicator(dimens = dimens)
+        LoadingIndicator(
+            dimens = dimens,
+            backgroundColor = indicatorBackgroundColor,
+        )
     } else {
         TextWithIcons(
             text = text,
@@ -231,10 +238,14 @@ private fun IconSlot(
  * Loading spinner for button loading state.
  */
 @Composable
-private fun LoadingIndicator(dimens: PrimaryButtonDefaults.PrimaryButtonDimens) {
+private fun LoadingIndicator(
+    dimens: PrimaryButtonDefaults.PrimaryButtonDimens,
+    backgroundColor: Color,
+) {
     NativeLoadingIndicator(
         modifier = Modifier.size(dimens.iconSize),
         color = LocalContentColor.current,
+        backgroundColor = backgroundColor,
     )
 }
 

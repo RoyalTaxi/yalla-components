@@ -83,6 +83,8 @@ fun SecondaryButton(
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     val isInteractive = state.enabled && !state.loading
+    val containerColor = colors.containerColor(isInteractive)
+    val contentColor = colors.contentColor(isInteractive)
 
     Surface(
         onClick = onClick,
@@ -92,8 +94,8 @@ fun SecondaryButton(
         ),
         enabled = isInteractive,
         shape = dimens.shape,
-        color = colors.containerColor(isInteractive),
-        contentColor = colors.contentColor(isInteractive),
+        color = containerColor,
+        contentColor = contentColor,
     ) {
         Row(
             modifier = Modifier.padding(dimens.contentPadding(state.size)),
@@ -104,6 +106,7 @@ fun SecondaryButton(
                 NativeLoadingIndicator(
                     modifier = Modifier.size(dimens.iconSize),
                     color = LocalContentColor.current,
+                    backgroundColor = containerColor,
                 )
             } else {
                 leadingIcon?.let { icon ->
