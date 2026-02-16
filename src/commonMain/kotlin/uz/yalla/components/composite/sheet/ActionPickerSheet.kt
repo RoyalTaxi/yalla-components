@@ -35,11 +35,13 @@ import uz.yalla.platform.model.IconType
  * @param title Action text.
  * @param icon Icon painter.
  * @param onClick Called when action tapped.
+ * @param isDestructive Whether this is a destructive action (shows icon in red).
  */
 data class ActionPickerItem(
     val title: String,
     val icon: Painter,
     val onClick: () -> Unit,
+    val isDestructive: Boolean = false,
 )
 
 /**
@@ -173,7 +175,7 @@ private fun ActionPickerItemRow(
         Icon(
             painter = item.icon,
             contentDescription = null,
-            tint = colors.itemIcon,
+            tint = if (item.isDestructive) colors.destructiveItemIcon else colors.itemIcon,
         )
 
         Spacer(modifier = Modifier.width(dimens.itemIconTextSpacing))
@@ -202,6 +204,7 @@ object ActionPickerDefaults {
      * @param itemBackground Item background color.
      * @param itemIcon Item icon tint.
      * @param itemText Item text color.
+     * @param destructiveItemIcon Icon tint for destructive actions.
      */
     data class ActionPickerColors(
         val container: Color,
@@ -209,6 +212,7 @@ object ActionPickerDefaults {
         val itemBackground: Color,
         val itemIcon: Color,
         val itemText: Color,
+        val destructiveItemIcon: Color,
     )
 
     @Composable
@@ -218,12 +222,14 @@ object ActionPickerDefaults {
         itemBackground: Color = System.color.backgroundSecondary,
         itemIcon: Color = System.color.iconBase,
         itemText: Color = System.color.textBase,
+        destructiveItemIcon: Color = System.color.iconRed,
     ): ActionPickerColors = ActionPickerColors(
         container = container,
         title = title,
         itemBackground = itemBackground,
         itemIcon = itemIcon,
         itemText = itemText,
+        destructiveItemIcon = destructiveItemIcon,
     )
 
     /**
