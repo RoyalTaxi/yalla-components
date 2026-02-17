@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "uz.yalla"
-version = "2.2.4"
+version = "2.3.0"
 
 kotlin {
     targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java).configureEach {
@@ -101,6 +101,11 @@ kotlin {
             // iOS-specific dependencies if needed
         }
     }
+}
+
+dependencies {
+    // Required for commonMain previews with AGP 9 + com.android.kotlin.multiplatform.library.
+    androidRuntimeClasspath(libs.compose.ui.tooling)
 }
 
 publishing {

@@ -36,3 +36,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "yalla-components"
+include(":example")

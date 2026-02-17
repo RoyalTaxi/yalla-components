@@ -15,7 +15,7 @@ A Kotlin Multiplatform component library for Yalla apps, built with Compose Mult
 Add the dependency to your `build.gradle.kts`:
 
 ```kotlin
-implementation("uz.yalla:components:2.0.1")
+implementation("uz.yalla:components:2.3.0")
 ```
 
 Configure GitHub Packages repository:
