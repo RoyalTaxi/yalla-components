@@ -161,7 +161,7 @@ fun HistoryCard(
     state: HistoryCardState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    route: @Composable () -> Unit = {},
+    route: (@Composable () -> Unit)? = null,
     image: (@Composable () -> Unit)? = null,
     colors: HistoryCardDefaults.HistoryCardColors = HistoryCardDefaults.colors(),
     style: HistoryCardDefaults.HistoryCardStyle = HistoryCardDefaults.style(),
@@ -185,9 +185,10 @@ fun HistoryCard(
                     .fillMaxHeight()
                     .weight(1f),
             ) {
-                route()
-
-                Spacer(Modifier.height(dimens.spacingSmall))
+                route?.let {
+                    it()
+                    Spacer(Modifier.height(dimens.spacingSmall))
+                }
                 Spacer(Modifier.weight(1f))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {

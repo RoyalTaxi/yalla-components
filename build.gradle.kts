@@ -38,6 +38,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // Yalla libraries
+            api(project.dependencies.platform(libs.yalla.bom))
             api(libs.yalla.core)
             implementation(libs.yalla.design)
             implementation(libs.yalla.resources)

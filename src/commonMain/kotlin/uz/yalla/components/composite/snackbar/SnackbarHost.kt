@@ -63,7 +63,7 @@ object AppSnackbarHostDefaults {
     @Composable
     fun dimens(
         topPadding: Dp = 8.dp,
-        horizontalPadding: Dp = 24.dp,
+        horizontalPadding: Dp = 16.dp,
     ) = AppSnackbarHostDimens(
         topPadding = topPadding,
         horizontalPadding = horizontalPadding,

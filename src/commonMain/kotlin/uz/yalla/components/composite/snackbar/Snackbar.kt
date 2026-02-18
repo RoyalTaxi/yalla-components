@@ -1,6 +1,7 @@
 package uz.yalla.components.composite.snackbar
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -129,14 +129,14 @@ fun Snackbar(
                 overflow = TextOverflow.Ellipsis,
             )
 
-            IconButton(onClick = onDismiss) {
-                Icon(
-                    painter = state.dismissIcon,
-                    contentDescription = null,
-                    tint = colors.dismissIcon,
-                    modifier = Modifier.size(dimens.dismissIconSize),
-                )
-            }
+            Icon(
+                painter = state.dismissIcon,
+                contentDescription = null,
+                tint = colors.dismissIcon,
+                modifier = Modifier
+                    .size(dimens.dismissIconSize)
+                    .clickable(onClick = onDismiss),
+            )
         }
     }
 }
@@ -243,7 +243,7 @@ object SnackbarDefaults {
 
     @Composable
     fun dimens(
-        shape: Shape = RoundedCornerShape(16.dp),
+        shape: Shape = RoundedCornerShape(12.dp),
         contentSpacing: Dp = 8.dp,
         verticalPadding: Dp = 12.dp,
         horizontalPadding: Dp = 16.dp,
@@ -264,4 +264,3 @@ object SnackbarDefaults {
         messageMaxLines = messageMaxLines,
     )
 }
-

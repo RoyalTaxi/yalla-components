@@ -1,9 +1,6 @@
 [versions]
 # Yalla libraries
-yalla-core = "1.0.0"
-yalla-design = "1.1.0"
-yalla-resources = "1.5.0"
-yalla-platform = "2.1.2"
+yalla-bom = "1.0.1"
 
 # Core
 agp = "9.0.0"
@@ -41,10 +38,11 @@ constraintlayout = "0.6.1"
 
 [libraries]
 # Yalla
-yalla-core = { module = "uz.yalla:core", version.ref = "yalla-core" }
-yalla-design = { module = "uz.yalla:design", version.ref = "yalla-design" }
-yalla-resources = { module = "uz.yalla:resources", version.ref = "yalla-resources" }
-yalla-platform = { module = "uz.yalla:platform", version.ref = "yalla-platform" }
+yalla-bom = { module = "uz.yalla:bom", version.ref = "yalla-bom" }
+yalla-core = { module = "uz.yalla:core" }
+yalla-design = { module = "uz.yalla:design" }
+yalla-resources = { module = "uz.yalla:resources" }
+yalla-platform = { module = "uz.yalla:platform" }
 
 # Compose
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
